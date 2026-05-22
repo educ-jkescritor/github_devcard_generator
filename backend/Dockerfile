@@ -10,7 +10,7 @@ RUN pip install uv
 # Copy dependency files
 COPY pyproject.toml requirements.txt ./
 
-# Install dependencies
+# Install dependencies using uv
 RUN uv pip install --system -r requirements.txt
 
 # Copy application code

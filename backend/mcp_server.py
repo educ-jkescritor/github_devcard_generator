@@ -1,18 +1,34 @@
+import os
+from dotenv import load_dotenv
+
+# Load environment variables at the VERY top
+if os.path.exists(".env"):
+    load_dotenv(".env")
+elif os.path.exists("../.env"):
+    load_dotenv("../.env")
+else:
+    load_dotenv()
+
+# Ensure both key names are set for maximum compatibility
+if os.getenv("GOOGLE_API_KEY") and not os.getenv("GEMINI_API_KEY"):
+    os.environ["GEMINI_API_KEY"] = os.getenv("GOOGLE_API_KEY")
+if os.getenv("GEMINI_API_KEY") and not os.getenv("GOOGLE_API_KEY"):
+    os.environ["GOOGLE_API_KEY"] = os.getenv("GEMINI_API_KEY")
+
 from fastmcp import FastMCP
 import requests
 import json
-import os
 from datetime import datetime
 from google import genai
-from dotenv import load_dotenv
-
-load_dotenv()
 
 # Initialize FastMCP server
 mcp = FastMCP("GitHubDevCard")
 
-# Configure Gemini
-client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
+# Configure Gemini - passing API key explicitly for Cloud Run reliability
+key = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
+if not key:
+    print("[mcp_server] ERROR: No API Key found in environment!")
+client = genai.Client(api_key=key)
 
 @mcp.tool()
 def scrape_github(username: str) -> dict:
@@ -109,7 +125,7 @@ def analyze_profile(github_data: dict) -> dict:
     
     try:
         response = client.models.generate_content(
-            model="gemini-2.5-flash",
+            model="gemini-flash-latest",
             contents=prompt
         )
         print(f"[analyze_profile] Got response from Gemini")

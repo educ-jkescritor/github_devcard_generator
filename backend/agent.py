@@ -1,24 +1,35 @@
 import os
+import sys
+from dotenv import load_dotenv
+
+# Load environment variables at the VERY top
+if os.path.exists(".env"):
+    load_dotenv(".env")
+elif os.path.exists("../.env"):
+    load_dotenv("../.env")
+else:
+    load_dotenv()
+
+# Ensure both key names are set for maximum compatibility
+if os.getenv("GOOGLE_API_KEY") and not os.getenv("GEMINI_API_KEY"):
+    os.environ["GEMINI_API_KEY"] = os.getenv("GOOGLE_API_KEY")
+if os.getenv("GEMINI_API_KEY") and not os.getenv("GOOGLE_API_KEY"):
+    os.environ["GOOGLE_API_KEY"] = os.getenv("GEMINI_API_KEY")
+
 from google.adk.agents.llm_agent import LlmAgent
 from google.adk.tools.mcp_tool.mcp_toolset import (
     McpToolset, 
     StdioConnectionParams, 
     StdioServerParameters
 )
-from dotenv import load_dotenv
-
-load_dotenv()
 
 # Define the MCP toolset connecting to our mcp_server.py
 mcp_toolset = McpToolset(
     connection_params=StdioConnectionParams(
         server_params=StdioServerParameters(
-            command="python",
+            command=sys.executable,
             args=[os.path.join(os.path.dirname(__file__), "mcp_server.py")],
-            env={
-                "GOOGLE_API_KEY": os.getenv("GOOGLE_API_KEY", ""),
-                "GITHUB_TOKEN": os.getenv("GITHUB_TOKEN", ""),
-            }
+            env=os.environ.copy() # Pass the full environment
         ),
         timeout=60.0
     )
@@ -27,7 +38,7 @@ mcp_toolset = McpToolset(
 # Define the GitHub Dev Card Agent
 github_card_agent = LlmAgent(
     name="github_card_agent",
-    model="gemini-2.5-flash",
+    model="gemini-flash-latest",
     instruction="""
     You are a GitHub profile analyst and dev card generator. 
     When a user gives you a GitHub username, you MUST follow this exact sequence: 

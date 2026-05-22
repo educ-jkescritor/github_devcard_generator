@@ -1,9 +1,28 @@
+import os
+from dotenv import load_dotenv
+
+# Load environment variables at the VERY top
+if os.path.exists(".env"):
+    load_dotenv(".env")
+elif os.path.exists("../.env"):
+    load_dotenv("../.env")
+else:
+    load_dotenv()
+
+# Ensure both key names are set for maximum compatibility
+key = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
+if key:
+    os.environ["GOOGLE_API_KEY"] = key
+    os.environ["GEMINI_API_KEY"] = key
+    print(f"API Key detected in environment: {key[:4]}...{key[-4:]}")
+else:
+    print("CRITICAL: No API Key found in environment variables!")
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
-import os
 import asyncio
 
 from google.adk import Runner
@@ -15,7 +34,8 @@ from agent import github_card_agent
 # Initialize FastAPI app
 app = FastAPI(title="GitHub Dev Card Generator")
 
-# Add CORS middleware
+# Add CORS middleware with more specific configuration if needed, 
+# but "*" is generally fine for local dev.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -54,6 +74,8 @@ async def generate_card(request: GenerateRequest):
     session_id = f"session_{username}"
     user_id = "default_user"
     
+    print(f"\n--- New Request: {username} ---")
+    
     try:
         # Prepare content
         content = types.Content(
@@ -73,36 +95,32 @@ async def generate_card(request: GenerateRequest):
         event_count = 0
         async for event in events:
             event_count += 1
-            print(f"Event {event_count}: type={type(event).__name__}, is_final={event.is_final_response()}")
+            # print(f"Event {event_count}: type={type(event).__name__}")
             
             # Check if this is a final response part
             if event.is_final_response():
                 if event.content and event.content.parts:
                     for part in event.content.parts:
                         if part.text:
-                            safe_text = part.text[:100].encode('ascii', errors='replace').decode('ascii')
-                            print(f"Final response text: {safe_text}")
                             final_text += part.text
             
             # If there's an error in the event
             if event.error_message:
-                safe_error = event.error_message.encode('ascii', errors='replace').decode('ascii')
-                print(f"Agent Event Error: {safe_error}")
+                print(f"AGENT ERROR EVENT: {event.error_message}")
                 raise Exception(event.error_message)
 
-        print(f"Total events processed: {event_count}")
+        print(f"Agent finished. Total events: {event_count}")
 
         # The agent is instructed to save the card.
         # Check if it was actually saved
         file_path = os.path.join(cards_dir, f"{username}.html")
         if not os.path.exists(file_path):
-            # If not saved yet, maybe give it a moment or check the response
-            print(f"Warning: Card file not found at {file_path}")
-            # We could trigger the tool call directly if the agent failed to do it, 
-            # but the agent is instructed to do it.
-        else:
-            print(f"Card file successfully saved at {file_path}")
+            print(f"CRITICAL: Card file NOT found at {file_path}")
+            # Try to see if the agent returned the HTML in final_text but didn't save?
+            # For now, just report the error.
+            raise HTTPException(status_code=500, detail="Agent failed to save the card file.")
         
+        print(f"Card successfully verified at {file_path}")
         card_path = f"/static/cards/{username}.html"
         
         return {
@@ -112,22 +130,25 @@ async def generate_card(request: GenerateRequest):
             "agent_response": final_text
         }
     except Exception as e:
-        print(f"Error in generate_card: {str(e)}")
-        import traceback
-        traceback.print_exc()
+        print(f"EXCEPTION in generate_card: {str(e)}")
+        # import traceback
+        # traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/card/{username}")
 async def get_card(username: str):
     file_path = os.path.join(cards_dir, f"{username}.html")
+    print(f"Fetching card for {username}: {file_path}")
     if os.path.exists(file_path):
         return FileResponse(file_path)
+    print(f"Card not found: {file_path}")
     raise HTTPException(status_code=404, detail="Card not found")
 
 @app.get("/health")
 async def health():
-    return {"status": "ok"}
+    return {"status": "ok", "google_api_key": "present" if os.getenv("GOOGLE_API_KEY") else "missing"}
 
 if __name__ == "__main__":
     import uvicorn
+    print("Starting FastAPI server on http://0.0.0.0:8080")
     uvicorn.run(app, host="0.0.0.0", port=8080)

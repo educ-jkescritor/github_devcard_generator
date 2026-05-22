@@ -34,7 +34,7 @@ print(f" - Top Repos:")
 for idx, repo in enumerate(github_data.get('top_repos', [])):
     print(f"    {idx+1}. {repo['name']} (Stars: {repo['stars']}, Lang: {repo['language']})")
 
-print(f"\n2. Analyzing profile using Gemini...")
+print(f"\n2. Analyzing profile using Gemini (1.5 Flash)...")
 analysis = analyze_profile(github_data)
 print("\nGEMINI ANALYSIS RESULT:")
 print(f" - Developer Vibe: {analysis.get('developer_vibe')}")

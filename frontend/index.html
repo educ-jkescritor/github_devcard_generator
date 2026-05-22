@@ -250,8 +250,18 @@
         // Fallback for BACKEND_URL if not replaced by envsubst
         let BACKEND_URL = '${BACKEND_URL}';
         if (BACKEND_URL.startsWith('$') || !BACKEND_URL) {
-            BACKEND_URL = 'http://localhost:8080';
+            // Try to auto-detect
+            if (window.location.protocol === 'file:') {
+                // If opened as a local file, default to localhost
+                BACKEND_URL = 'http://localhost:8080';
+            } else if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                BACKEND_URL = 'http://localhost:8080';
+            } else {
+                BACKEND_URL = window.location.protocol + "//" + window.location.hostname + ":8080";
+            }
         }
+
+        console.log("Using BACKEND_URL:", BACKEND_URL);
 
         let lastCardUrl = "";
 
@@ -274,10 +284,14 @@
             skeleton.style.display = "block";
 
             try {
+                console.log(`Fetching ${BACKEND_URL}/generate for user ${username}`);
                 const response = await fetch(`${BACKEND_URL}/generate`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username })
+                }).catch(err => {
+                    console.error("Fetch error:", err);
+                    throw new Error(`Cannot reach backend at ${BACKEND_URL}. <br><br><b>Is the backend running?</b><br>Please run <code>python main.py</code> in the backend folder.`);
                 });
 
                 if (!response.ok) {
@@ -289,6 +303,8 @@
                 
                 // Fetch the actual saved HTML card to render it inline
                 const cardResp = await fetch(`${BACKEND_URL}/card/${username}`);
+                if (!cardResp.ok) throw new Error("Card generated but failed to retrieve preview.");
+                
                 const cardHtml = await cardResp.text();
 
                 // Extract only the inner dev-card div from the full HTML doc
@@ -302,6 +318,7 @@
                 skeleton.style.display = "none";
                 result.style.display = "flex";
             } catch (err) {
+                console.error("App Error:", err);
                 skeleton.style.display = "none";
                 error.innerText = err.message;
                 error.style.display = "block";
