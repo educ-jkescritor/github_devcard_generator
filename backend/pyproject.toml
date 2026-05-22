@@ -1,0 +1,17 @@
+[project]
+name = "github-dev-card-generator"
+version = "0.1.0"
+description = "GitHub Dev Card Generator using Google ADK and MCP"
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "google-adk",
+    "fastmcp",
+    "python-dotenv",
+    "pydantic",
+    "requests",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
