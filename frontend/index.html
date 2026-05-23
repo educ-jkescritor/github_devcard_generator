@@ -10,13 +10,14 @@
     <style>
         :root {
             --bg-color: #0d1117;
+            --bg-gradient: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
             --container-bg: #161b22;
             --text-primary: #f0f6fc;
             --text-secondary: #8b949e;
             --accent-color: #238636;
             --accent-hover: #2ea043;
-            --error-color: #f85149;
             --border-color: #30363d;
+            --card-gold: #d4af37;
         }
 
         * {
@@ -27,19 +28,39 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--bg-color);
+            background: var(--bg-gradient);
             color: var(--text-primary);
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            padding: 20px;
+            overflow: hidden;
+            perspective: 1200px;
         }
 
-        .main-container {
-            max-width: 600px;
+        .app-container {
             width: 100%;
+            max-width: 600px;
             text-align: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        /* Views */
+        .view {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        .view.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         h1 {
@@ -49,21 +70,24 @@
             letter-spacing: -1px;
         }
 
-        p.subheading {
+        .subheading {
             color: var(--text-secondary);
-            font-size: 1.1rem;
             margin-bottom: 40px;
+            font-size: 1.1rem;
         }
 
+        /* Input View */
         .input-group {
             display: flex;
             gap: 10px;
-            margin-bottom: 30px;
             background: var(--container-bg);
             padding: 10px;
-            border-radius: 12px;
+            border-radius: 16px;
             border: 1px solid var(--border-color);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 450px;
+            margin: 0 auto;
         }
 
         input {
@@ -76,270 +100,297 @@
             outline: none;
         }
 
-        input::placeholder {
-            color: #484f58;
-        }
+        input::placeholder { color: #484f58; }
 
-        button {
+        button.primary-btn {
             background-color: var(--accent-color);
             color: white;
             border: none;
             padding: 12px 24px;
-            border-radius: 8px;
+            border-radius: 12px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
         }
 
-        button:hover {
+        button.primary-btn:hover {
             background-color: var(--accent-hover);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(35, 134, 54, 0.3);
+            box-shadow: 0 5px 15px rgba(35, 134, 54, 0.3);
         }
 
-        button:active {
-            transform: translateY(0);
+        /* Loading */
+        .loading-container { margin-top: 20px; }
+        .pulse-loader {
+            width: 60px; height: 60px; background-color: var(--accent-color); border-radius: 50%;
+            animation: pulse 1.5s ease-in-out infinite; margin: 0 auto 20px;
+        }
+        @keyframes pulse {
+            0% { transform: scale(0.8); opacity: 0.5; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(0.8); opacity: 0.5; }
         }
 
-        button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none !important;
-        }
-
-        /* Result Area */
-        #result-container {
-            margin-top: 20px;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            animation: fadeIn 0.6s ease-out forwards;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        #card-render {
+        /* Trading Card Component Styles */
+        .card-container {
             width: 100%;
             display: flex;
             justify-content: center;
-        }
-
-        .share-btn {
-            margin-top: 20px;
-            background: #21262d;
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-        }
-
-        .share-btn:hover {
-            background: #30363d;
-            box-shadow: none;
-        }
-
-        /* Loading Skeleton */
-        #loading-skeleton {
-            display: none;
-            width: 400px;
-            height: 350px;
-            background: var(--container-bg);
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            padding: 20px;
-            margin: 0 auto;
-        }
-
-        .skeleton-item {
-            background: linear-gradient(90deg, #21262d 25%, #30363d 50%, #21262d 75%);
-            background-size: 200% 100%;
-            animation: skeleton-loading 1.5s infinite;
-            border-radius: 4px;
-        }
-
-        @keyframes skeleton-loading {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
-
-        .skeleton-header { display: flex; align-items: center; margin-bottom: 20px; }
-        .skeleton-avatar { width: 60px; height: 60px; border-radius: 50%; margin-right: 15px; }
-        .skeleton-title { width: 150px; height: 20px; margin-bottom: 8px; }
-        .skeleton-subtitle { width: 100px; height: 14px; }
-        .skeleton-line { width: 100%; height: 12px; margin-bottom: 10px; }
-        .skeleton-stats { display: flex; justify-content: space-between; margin-top: 20px; }
-        .skeleton-stat { width: 60px; height: 20px; }
-
-        /* Error state */
-        #error-message {
-            display: none;
-            color: var(--error-color);
-            background: rgba(248, 81, 73, 0.1);
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid rgba(248, 81, 73, 0.2);
             margin-top: 20px;
         }
 
-        .copy-toast {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--accent-color);
-            color: white;
-            padding: 8px 16px;
+        .trading-card {
+            width: 350px;
+            background: #1c2128;
+            border: 10px solid var(--card-gold);
             border-radius: 20px;
-            font-size: 0.9rem;
-            display: none;
-            z-index: 1000;
+            padding: 12px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5), inset 0 0 20px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+            text-align: left;
+            transform-style: preserve-3d;
+            backface-visibility: hidden;
+            transition: transform 0.1s ease-out;
+            color: #f0f6fc;
         }
+
+        /* Entry Animation: 720deg Spin + Scale + Bounce */
+        .card-entrance {
+            animation: revealCard 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        @keyframes revealCard {
+            0% { opacity: 0; transform: scale(0.3) rotateY(720deg); }
+            100% { opacity: 1; transform: scale(1) rotateY(0deg); }
+        }
+
+        /* Holographic Glare Layer */
+        .glare {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0) 100%);
+            background-size: 200% 200%;
+            pointer-events: none;
+            z-index: 10;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .trading-card:hover .glare { opacity: 1; }
+
+        /* Card Sections */
+        .card-header { 
+            display: flex; align-items: center; justify-content: space-between; 
+            margin-bottom: 10px; padding: 6px 10px; background: rgba(255,255,255,0.05); 
+            border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); 
+        }
+        .profile-pic { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--card-gold); object-fit: cover; }
+        .username-label { font-weight: 800; font-size: 1.1rem; color: #fff; }
+        .stat-badge { font-size: 0.8rem; font-weight: 700; color: var(--card-gold); text-transform: uppercase; }
+
+        .art-box {
+            height: 180px; margin: 8px 0; border: 4px solid #30363d; border-radius: 8px; padding: 15px;
+            display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
+            position: relative; background: linear-gradient(135deg, #1e293b, #0f172a);
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.5);
+        }
+        .bio-text { font-size: 0.9rem; font-style: italic; line-height: 1.4; color: #e6edf3; }
+        .lang-tag { 
+            position: absolute; bottom: 10px; right: 10px; background: var(--card-gold); 
+            color: #000; padding: 2px 8px; border-radius: 4px; font-weight: 800; 
+            font-size: 0.7rem; text-transform: uppercase; 
+        }
+
+        .abilities-section { padding: 8px 4px; }
+        .section-title { 
+            font-size: 0.7rem; font-weight: 800; color: var(--text-secondary); 
+            text-transform: uppercase; border-bottom: 1px solid #30363d; margin-bottom: 10px; padding-bottom: 2px;
+        }
+        .ability { margin-bottom: 12px; }
+        .ability-header { display: flex; justify-content: space-between; align-items: center; }
+        .ability-name { font-weight: 700; font-size: 0.9rem; color: var(--accent-hover); }
+        .ability-hp { font-size: 0.7rem; color: var(--card-gold); font-weight: 800; }
+        .ability-desc { font-size: 0.75rem; color: var(--text-secondary); margin-top: 2px; line-height: 1.3; }
+        .ability-stats { font-size: 0.7rem; color: #f0f6fc; margin-top: 4px; font-weight: 600; opacity: 0.8; }
+
+        .card-footer { 
+            margin-top: 10px; display: flex; justify-content: space-between; align-items: center; 
+            padding: 0 5px; opacity: 0.6;
+        }
+        .auth-stamp { 
+            font-size: 0.6rem; font-weight: 800; color: #fff; text-transform: uppercase; 
+            letter-spacing: 1px; border: 1px solid rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 4px; 
+        }
+        .rarity-star { color: var(--card-gold); font-size: 1.2rem; }
+
+        .reset-btn { margin-top: 30px; background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); }
+        .reset-btn:hover { background: #21262d; color: var(--text-primary); }
+
     </style>
 </head>
 <body>
-    <div class="main-container">
-        <h1>GitHub Dev Card Generator</h1>
-        <p class="subheading">Enter any public GitHub username</p>
-
-        <div class="input-group">
-            <input type="text" id="username" placeholder="e.g. torvalds" spellcheck="false" autocomplete="off">
-            <button id="generate-btn" onclick="generateCard()">
-                <span id="btn-text">Generate Card</span>
-            </button>
-        </div>
-
-        <!-- Loading Skeleton -->
-        <div id="loading-skeleton">
-            <div class="skeleton-header">
-                <div class="skeleton-item skeleton-avatar"></div>
-                <div>
-                    <div class="skeleton-item skeleton-title"></div>
-                    <div class="skeleton-item skeleton-subtitle"></div>
-                </div>
-            </div>
-            <div class="skeleton-item skeleton-line"></div>
-            <div class="skeleton-item skeleton-line"></div>
-            <div class="skeleton-item skeleton-line" style="width: 80%;"></div>
-            <div class="skeleton-stats">
-                <div class="skeleton-item skeleton-stat"></div>
-                <div class="skeleton-item skeleton-stat"></div>
-                <div class="skeleton-item skeleton-stat"></div>
+    <div class="app-container">
+        <!-- Input View -->
+        <div id="view-input" class="view active">
+            <h1>Dev Card Generator</h1>
+            <p class="subheading">Mint a rare trading card of any GitHub developer</p>
+            <div class="input-group">
+                <input type="text" id="username-input" placeholder="e.g. torvalds" spellcheck="false" autocomplete="off">
+                <button class="primary-btn" onclick="processGeneration()">Generate</button>
             </div>
         </div>
 
-        <!-- Error Message -->
-        <div id="error-message"></div>
+        <!-- Loading View -->
+        <div id="view-loading" class="view">
+            <div class="loading-container">
+                <div class="pulse-loader"></div>
+                <p class="subheading">Analyzing GitHub metadata and minting card...</p>
+            </div>
+        </div>
 
-        <!-- Result Container -->
-        <div id="result-container">
-            <div id="card-render"></div>
-            <button class="share-btn" onclick="copyUrl()">
-                Share Card URL
-            </button>
+        <!-- Results View -->
+        <div id="view-results" class="view">
+            <h1>Generation Complete</h1>
+            <p class="subheading">You pulled a Rare Developer card!</p>
+            <div id="card-render-area" class="card-container"></div>
+            <button class="primary-btn reset-btn" onclick="resetFlow()">Generate Another</button>
         </div>
     </div>
 
-    <div id="toast" class="copy-toast">Copied to clipboard!</div>
-
     <script>
-        // Fallback for BACKEND_URL if not replaced by envsubst
-        let BACKEND_URL = '${BACKEND_URL}';
-        if (BACKEND_URL.startsWith('$') || !BACKEND_URL) {
-            // Try to auto-detect
-            if (window.location.protocol === 'file:') {
-                // If opened as a local file, default to localhost
-                BACKEND_URL = 'http://localhost:8080';
-            } else if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-                BACKEND_URL = 'http://localhost:8080';
-            } else {
-                BACKEND_URL = window.location.protocol + "//" + window.location.hostname + ":8080";
-            }
+        // Mock Data for instant testing
+        const mockProfile = {
+            name: "Linus Torvalds",
+            username: "torvalds",
+            followers: "304K",
+            bio: "A low-level systems legend who builds foundational operating systems while occasionally hacking on analog guitar electronics.",
+            primaryLang: "C",
+            avatar: "https://avatars.githubusercontent.com/u/1024025?v=4",
+            topRepos: [
+                { name: "linux", desc: "Linux kernel source tree", stars: "150,422", forks: "45,102" },
+                { name: "git", desc: "A distributed revision control system", stars: "48,931", forks: "20,551" }
+            ]
+        };
+
+        const langColorMap = {
+            'C': '#555555',
+            'JavaScript': '#f1e05a',
+            'TypeScript': '#3178c6',
+            'Python': '#3572A5',
+            'Rust': '#dea584'
+        };
+
+        function switchView(id) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
         }
 
-        console.log("Using BACKEND_URL:", BACKEND_URL);
+        async function processGeneration() {
+            const input = document.getElementById('username-input');
+            if (!input.value.trim()) return;
+            const targetUsername = input.value.trim();
 
-        let lastCardUrl = "";
+            switchView('view-loading');
 
-        async function generateCard() {
-            const usernameInput = document.getElementById('username');
-            const username = usernameInput.value.trim();
-            if (!username) return;
-
-            const btn = document.getElementById('generate-btn');
-            const skeleton = document.getElementById('loading-skeleton');
-            const result = document.getElementById('result-container');
-            const error = document.getElementById('error-message');
-            const renderArea = document.getElementById('card-render');
-
-            // Reset UI
-            btn.disabled = true;
-            document.getElementById('btn-text').innerText = "Generating...";
-            error.style.display = "none";
-            result.style.display = "none";
-            skeleton.style.display = "block";
-
-            try {
-                console.log(`Fetching ${BACKEND_URL}/generate for user ${username}`);
-                const response = await fetch(`${BACKEND_URL}/generate`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username })
-                }).catch(err => {
-                    console.error("Fetch error:", err);
-                    throw new Error(`Cannot reach backend at ${BACKEND_URL}. <br><br><b>Is the backend running?</b><br>Please run <code>python main.py</code> in the backend folder.`);
-                });
-
-                if (!response.ok) {
-                    const data = await response.json();
-                    throw new Error(data.detail || "Failed to generate card");
-                }
-
-                const data = await response.json();
-                
-                // Fetch the actual saved HTML card to render it inline
-                const cardResp = await fetch(`${BACKEND_URL}/card/${username}`);
-                if (!cardResp.ok) throw new Error("Card generated but failed to retrieve preview.");
-                
-                const cardHtml = await cardResp.text();
-
-                // Extract only the inner dev-card div from the full HTML doc
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(cardHtml, 'text/html');
-                const devCard = doc.querySelector('.dev-card');
-
-                renderArea.innerHTML = devCard ? devCard.outerHTML : cardHtml;
-                lastCardUrl = `${BACKEND_URL}${data.card_url}`;
-                
-                skeleton.style.display = "none";
-                result.style.display = "flex";
-            } catch (err) {
-                console.error("App Error:", err);
-                skeleton.style.display = "none";
-                error.innerText = err.message;
-                error.style.display = "block";
-            } finally {
-                btn.disabled = false;
-                document.getElementById('btn-text').innerText = "Generate Card";
-            }
+            // Simulate minting delay
+            setTimeout(() => {
+                injectCard(targetUsername);
+                switchView('view-results');
+            }, 2000);
         }
 
-        function copyUrl() {
-            if (!lastCardUrl) return;
-            navigator.clipboard.writeText(lastCardUrl);
-            
-            const toast = document.getElementById('toast');
-            toast.style.display = "block";
-            setTimeout(() => { toast.style.display = "none"; }, 2000);
+        function injectCard(username) {
+            const area = document.getElementById('card-render-area');
+            const data = { ...mockProfile, username: username };
+            const langColor = langColorMap[data.primaryLang] || '#1e293b';
+
+            area.innerHTML = `
+                <div class="trading-card card-entrance" id="dev-trading-card">
+                    <div class="glare" id="card-glare"></div>
+                    
+                    <div class="card-header">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <img src="${data.avatar}" class="profile-pic" alt="Avatar">
+                            <span class="username-label">${data.username}</span>
+                        </div>
+                        <span class="stat-badge">${data.followers} Followers</span>
+                    </div>
+                    
+                    <div class="art-box" style="background: linear-gradient(135deg, ${langColor}44, #0f172a); border-color: ${langColor}88;">
+                        <p class="bio-text">"${data.bio}"</p>
+                        <span class="lang-tag" style="background: ${langColor}; color: ${isColorLight(langColor) ? '#000' : '#fff'}">${data.primaryLang}</span>
+                    </div>
+                    
+                    <div class="abilities-section">
+                        <div class="section-title">Repositories & Abilities</div>
+                        ${data.topRepos.map(repo => `
+                            <div class="ability">
+                                <div class="ability-header">
+                                    <span class="ability-name">${repo.name}</span>
+                                    <span class="ability-hp">HP ${repo.stars}</span>
+                                </div>
+                                <div class="ability-desc">${repo.desc}</div>
+                                <div class="ability-stats">⭐ ${repo.stars} &nbsp; 🍴 ${repo.forks}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="card-footer">
+                        <div class="auth-stamp">DEV-GEN-2026</div>
+                        <div class="rarity-star">★</div>
+                    </div>
+                </div>
+            `;
+
+            setupPhysics();
+        }
+
+        function setupPhysics() {
+            const card = document.getElementById('dev-trading-card');
+            const glare = document.getElementById('card-glare');
+            if (!card) return;
+
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                
+                // 3D Parallax Tilt
+                const rotateX = ((centerY - y) / centerY) * 15;
+                const rotateY = ((x - centerX) / centerX) * 15;
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`;
+                
+                // Holographic Glare
+                const glareX = (x / rect.width) * 100;
+                const glareY = (y / rect.height) * 100;
+                glare.style.backgroundPosition = `${100 - glareX}% ${100 - glareY}%`;
+            });
+
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)`;
+            });
+        }
+
+        function isColorLight(color) {
+            const hex = color.replace('#', '');
+            const r = parseInt(hex.substr(0, 2), 16);
+            const g = parseInt(hex.substr(2, 2), 16);
+            const b = parseInt(hex.substr(4, 2), 16);
+            const brightness = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+            return brightness > 155;
+        }
+
+        function resetFlow() {
+            document.getElementById('username-input').value = "";
+            switchView('view-input');
         }
 
         // Support Enter key
-        document.getElementById('username').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') generateCard();
+        document.getElementById('username-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') processGeneration();
         });
     </script>
 </body>
