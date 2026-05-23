@@ -5,6 +5,10 @@ services:
       - "8080:8080"
     env_file:
       - .env
+    environment:
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - GEMINI_API_KEY=${GOOGLE_API_KEY}
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
     volumes:
       - ./backend/static:/app/static
 

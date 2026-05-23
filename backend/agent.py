@@ -11,10 +11,13 @@ else:
     load_dotenv()
 
 # Ensure both key names are set for maximum compatibility
-if os.getenv("GOOGLE_API_KEY") and not os.getenv("GEMINI_API_KEY"):
-    os.environ["GEMINI_API_KEY"] = os.getenv("GOOGLE_API_KEY")
-if os.getenv("GEMINI_API_KEY") and not os.getenv("GOOGLE_API_KEY"):
-    os.environ["GOOGLE_API_KEY"] = os.getenv("GEMINI_API_KEY")
+key = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
+if key:
+    os.environ["GOOGLE_API_KEY"] = key
+    os.environ["GEMINI_API_KEY"] = key
+    print(f"[agent] API Key detected: {key[:4]}...{key[-4:]}")
+else:
+    print("[agent] WARNING: No API Key found in environment!")
 
 from google.adk.agents.llm_agent import LlmAgent
 from google.adk.tools.mcp_tool.mcp_toolset import (
@@ -38,7 +41,7 @@ mcp_toolset = McpToolset(
 # Define the GitHub Dev Card Agent
 github_card_agent = LlmAgent(
     name="github_card_agent",
-    model="gemini-flash-latest",
+    model="gemini-flash-lite-latest",
     instruction="""
     You are a GitHub profile analyst and dev card generator. 
     When a user gives you a GitHub username, you MUST follow this exact sequence: 

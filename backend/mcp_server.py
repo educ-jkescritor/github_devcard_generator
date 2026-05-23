@@ -27,8 +27,12 @@ mcp = FastMCP("GitHubDevCard")
 # Configure Gemini - passing API key explicitly for Cloud Run reliability
 key = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
 if not key:
-    print("[mcp_server] ERROR: No API Key found in environment!")
-client = genai.Client(api_key=key)
+    print("[mcp_server] CRITICAL ERROR: No API Key found in environment!")
+    # Let genai.Client try to find it in the environment itself if we can't
+    client = genai.Client()
+else:
+    print(f"[mcp_server] API Key detected: {key[:4]}...{key[-4:]}")
+    client = genai.Client(api_key=key)
 
 @mcp.tool()
 def scrape_github(username: str) -> dict:
@@ -125,7 +129,7 @@ def analyze_profile(github_data: dict) -> dict:
     
     try:
         response = client.models.generate_content(
-            model="gemini-flash-latest",
+            model="gemini-flash-lite-latest",
             contents=prompt
         )
         print(f"[analyze_profile] Got response from Gemini")
