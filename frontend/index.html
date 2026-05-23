@@ -18,6 +18,7 @@
             --accent-hover: #2ea043;
             --border-color: #30363d;
             --card-gold: #d4af37;
+            --error-color: #f85149;
         }
 
         * {
@@ -119,6 +120,8 @@
             box-shadow: 0 5px 15px rgba(35, 134, 54, 0.3);
         }
 
+        button:disabled { opacity: 0.6; cursor: not-allowed; }
+
         /* Loading */
         .loading-container { margin-top: 20px; }
         .pulse-loader {
@@ -129,6 +132,19 @@
             0% { transform: scale(0.8); opacity: 0.5; }
             50% { transform: scale(1.2); opacity: 1; }
             100% { transform: scale(0.8); opacity: 0.5; }
+        }
+
+        /* Error View */
+        #error-message {
+            color: var(--error-color);
+            background: rgba(248, 81, 73, 0.1);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid rgba(248, 81, 73, 0.2);
+            margin-top: 20px;
+            display: none;
+            font-size: 0.9rem;
+            max-width: 450px;
         }
 
         /* Trading Card Component Styles */
@@ -155,7 +171,6 @@
             color: #f0f6fc;
         }
 
-        /* Entry Animation: 720deg Spin + Scale + Bounce */
         .card-entrance {
             animation: revealCard 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
@@ -165,11 +180,10 @@
             100% { opacity: 1; transform: scale(1) rotateY(0deg); }
         }
 
-        /* Holographic Glare Layer */
         .glare {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0) 100%);
+            background: linear-gradient(135deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0) 100%);
             background-size: 200% 200%;
             pointer-events: none;
             z-index: 10;
@@ -178,7 +192,6 @@
         }
         .trading-card:hover .glare { opacity: 1; }
 
-        /* Card Sections */
         .card-header { 
             display: flex; align-items: center; justify-content: space-between; 
             margin-bottom: 10px; padding: 6px 10px; background: rgba(255,255,255,0.05); 
@@ -233,51 +246,46 @@
         <!-- Input View -->
         <div id="view-input" class="view active">
             <h1>Dev Card Generator</h1>
-            <p class="subheading">Mint a rare trading card of any GitHub developer</p>
+            <p class="subheading">Mint a real trading card of any GitHub developer</p>
             <div class="input-group">
                 <input type="text" id="username-input" placeholder="e.g. torvalds" spellcheck="false" autocomplete="off">
-                <button class="primary-btn" onclick="processGeneration()">Generate</button>
+                <button class="primary-btn" id="generate-btn" onclick="processGeneration()">Generate</button>
             </div>
+            <div id="error-message"></div>
         </div>
 
         <!-- Loading View -->
         <div id="view-loading" class="view">
             <div class="loading-container">
                 <div class="pulse-loader"></div>
-                <p class="subheading">Analyzing GitHub metadata and minting card...</p>
+                <p class="subheading" id="loading-text">Scraping GitHub ecosystem...</p>
             </div>
         </div>
 
         <!-- Results View -->
         <div id="view-results" class="view">
             <h1>Generation Complete</h1>
-            <p class="subheading">You pulled a Rare Developer card!</p>
+            <p class="subheading">You revealed a Rare Developer card!</p>
             <div id="card-render-area" class="card-container"></div>
             <button class="primary-btn reset-btn" onclick="resetFlow()">Generate Another</button>
         </div>
     </div>
 
     <script>
-        // Mock Data for instant testing
-        const mockProfile = {
-            name: "Linus Torvalds",
-            username: "torvalds",
-            followers: "304K",
-            bio: "A low-level systems legend who builds foundational operating systems while occasionally hacking on analog guitar electronics.",
-            primaryLang: "C",
-            avatar: "https://avatars.githubusercontent.com/u/1024025?v=4",
-            topRepos: [
-                { name: "linux", desc: "Linux kernel source tree", stars: "150,422", forks: "45,102" },
-                { name: "git", desc: "A distributed revision control system", stars: "48,931", forks: "20,551" }
-            ]
-        };
+        let BACKEND_URL = '${BACKEND_URL}';
+        if (BACKEND_URL.startsWith('$') || !BACKEND_URL) {
+            if (window.location.protocol === 'file:') {
+                BACKEND_URL = 'http://localhost:8080';
+            } else if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                BACKEND_URL = 'http://localhost:8080';
+            } else {
+                BACKEND_URL = window.location.protocol + "//" + window.location.hostname + ":8080";
+            }
+        }
 
         const langColorMap = {
-            'C': '#555555',
-            'JavaScript': '#f1e05a',
-            'TypeScript': '#3178c6',
-            'Python': '#3572A5',
-            'Rust': '#dea584'
+            'C': '#555555', 'JavaScript': '#f1e05a', 'TypeScript': '#3178c6',
+            'Python': '#3572A5', 'Rust': '#dea584', 'Go': '#00ADD8', 'Java': '#b07219'
         };
 
         function switchView(id) {
@@ -285,29 +293,85 @@
             document.getElementById(id).classList.add('active');
         }
 
-        async function processGeneration() {
-            const input = document.getElementById('username-input');
-            if (!input.value.trim()) return;
-            const targetUsername = input.value.trim();
-
-            switchView('view-loading');
-
-            // Simulate minting delay
-            setTimeout(() => {
-                injectCard(targetUsername);
-                switchView('view-results');
-            }, 2000);
+        function showError(msg) {
+            const err = document.getElementById('error-message');
+            err.innerText = msg;
+            err.style.display = "block";
+            switchView('view-input');
         }
 
-        function injectCard(username) {
+        async function processGeneration() {
+            const input = document.getElementById('username-input');
+            const btn = document.getElementById('generate-btn');
+            const targetUsername = input.value.trim();
+            if (!targetUsername) return;
+
+            btn.disabled = true;
+            document.getElementById('error-message').style.display = "none";
+            switchView('view-loading');
+
+            try {
+                // 1. Trigger Backend Agent
+                const response = await fetch(`${BACKEND_URL}/generate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: targetUsername })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || "Generation failed.");
+                }
+
+                document.getElementById('loading-text').innerText = "Analyzing metadata...";
+
+                // 2. Fetch the generated card to extract real data
+                const cardResp = await fetch(`${BACKEND_URL}/card/${targetUsername}`);
+                if (!cardResp.ok) throw new Error("Failed to retrieve generated card data.");
+                
+                const cardHtml = await cardResp.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(cardHtml, 'text/html');
+                
+                // 3. Extract STRICTLY from the generated ecosystem data
+                const realData = {
+                    username: targetUsername,
+                    name: doc.querySelector('h2')?.innerText || targetUsername,
+                    avatar: doc.querySelector('img')?.src || `https://github.com/${targetUsername}.png`,
+                    bio: doc.querySelector('p[style*="italic"]')?.innerText.replace(/"/g, '') || "No bio available.",
+                    followers: doc.querySelector('span:nth-child(2) strong')?.innerText || "0",
+                    primaryLang: doc.querySelector('.badge')?.innerText || "Coding",
+                    repos: []
+                };
+
+                // Extract Repos
+                const repoElements = doc.querySelectorAll('div[style*="border-bottom"]');
+                repoElements.forEach(el => {
+                    const name = el.querySelector('strong')?.innerText || "Unknown Repo";
+                    const stars = el.innerText.match(/⭐(\d+)/)?.[1] || "0";
+                    const desc = el.querySelector('small')?.innerText || "";
+                    realData.repos.push({ name, stars, desc });
+                });
+
+                // Final Step: Render Premium Card
+                renderPremiumCard(realData);
+                switchView('view-results');
+
+            } catch (err) {
+                console.error(err);
+                showError("Error: " + err.message);
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        function renderPremiumCard(data) {
             const area = document.getElementById('card-render-area');
-            const data = { ...mockProfile, username: username };
             const langColor = langColorMap[data.primaryLang] || '#1e293b';
 
             area.innerHTML = `
                 <div class="trading-card card-entrance" id="dev-trading-card">
                     <div class="glare" id="card-glare"></div>
-                    
                     <div class="card-header">
                         <div style="display:flex; align-items:center; gap:10px;">
                             <img src="${data.avatar}" class="profile-pic" alt="Avatar">
@@ -315,60 +379,44 @@
                         </div>
                         <span class="stat-badge">${data.followers} Followers</span>
                     </div>
-                    
                     <div class="art-box" style="background: linear-gradient(135deg, ${langColor}44, #0f172a); border-color: ${langColor}88;">
                         <p class="bio-text">"${data.bio}"</p>
                         <span class="lang-tag" style="background: ${langColor}; color: ${isColorLight(langColor) ? '#000' : '#fff'}">${data.primaryLang}</span>
                     </div>
-                    
                     <div class="abilities-section">
                         <div class="section-title">Repositories & Abilities</div>
-                        ${data.topRepos.map(repo => `
+                        ${data.repos.slice(0, 2).map(r => `
                             <div class="ability">
                                 <div class="ability-header">
-                                    <span class="ability-name">${repo.name}</span>
-                                    <span class="ability-hp">HP ${repo.stars}</span>
+                                    <span class="ability-name">${r.name}</span>
+                                    <span class="ability-hp">HP ${r.stars}</span>
                                 </div>
-                                <div class="ability-desc">${repo.desc}</div>
-                                <div class="ability-stats">⭐ ${repo.stars} &nbsp; 🍴 ${repo.forks}</div>
+                                <div class="ability-desc">${r.desc}</div>
+                                <div class="ability-stats">⭐ ${r.stars}</div>
                             </div>
                         `).join('')}
                     </div>
-                    
                     <div class="card-footer">
                         <div class="auth-stamp">DEV-GEN-2026</div>
                         <div class="rarity-star">★</div>
                     </div>
                 </div>
             `;
-
-            setupPhysics();
+            initPhysics();
         }
 
-        function setupPhysics() {
+        function initPhysics() {
             const card = document.getElementById('dev-trading-card');
             const glare = document.getElementById('card-glare');
             if (!card) return;
-
             card.addEventListener('mousemove', (e) => {
                 const rect = card.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                
-                const centerX = rect.width / 2;
-                const centerY = rect.height / 2;
-                
-                // 3D Parallax Tilt
-                const rotateX = ((centerY - y) / centerY) * 15;
-                const rotateY = ((x - centerX) / centerX) * 15;
+                const x = e.clientX - rect.left, y = e.clientY - rect.top;
+                const centerX = rect.width/2, centerY = rect.height/2;
+                const rotateX = ((centerY - y) / centerY) * 15, rotateY = ((x - centerX) / centerX) * 15;
                 card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`;
-                
-                // Holographic Glare
-                const glareX = (x / rect.width) * 100;
-                const glareY = (y / rect.height) * 100;
-                glare.style.backgroundPosition = `${100 - glareX}% ${100 - glareY}%`;
+                glare.style.backgroundPosition = `${100 - (x/rect.width)*100}% ${100 - (y/rect.height)*100}%`;
             });
-
             card.addEventListener('mouseleave', () => {
                 card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)`;
             });
@@ -376,11 +424,8 @@
 
         function isColorLight(color) {
             const hex = color.replace('#', '');
-            const r = parseInt(hex.substr(0, 2), 16);
-            const g = parseInt(hex.substr(2, 2), 16);
-            const b = parseInt(hex.substr(4, 2), 16);
-            const brightness = ((r * 299) + (g * 587) + (b * 114)) / 1000;
-            return brightness > 155;
+            const r = parseInt(hex.substr(0, 2), 16), g = parseInt(hex.substr(2, 2), 16), b = parseInt(hex.substr(4, 2), 16);
+            return ((r * 299) + (g * 587) + (b * 114)) / 1000 > 155;
         }
 
         function resetFlow() {
@@ -388,10 +433,7 @@
             switchView('view-input');
         }
 
-        // Support Enter key
-        document.getElementById('username-input').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') processGeneration();
-        });
+        document.getElementById('username-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') processGeneration(); });
     </script>
 </body>
 </html>
