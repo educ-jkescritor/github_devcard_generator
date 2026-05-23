@@ -12,20 +12,23 @@
                 <p style="margin: 0; opacity: 0.8; font-size: 14px;">@jjobligado</p>
             </div>
         </div>
-        <p style="font-style: italic; margin-bottom: 15px;">"A quiet explorer standing on the starting line of their coding journey with a completely fresh canvas."</p>
-        <div style="margin-bottom: 15px;">
-            <span class="badge" style="background:#0366d6; color:white; padding:4px 8px; border-radius:12px; margin-right:5px; font-size:12px;">Curiosity</span><span class="badge" style="background:#0366d6; color:white; padding:4px 8px; border-radius:12px; margin-right:5px; font-size:12px;">Stealth Mode</span><span class="badge" style="background:#0366d6; color:white; padding:4px 8px; border-radius:12px; margin-right:5px; font-size:12px;">Potential</span>
+        <p style="font-style: italic; margin-bottom: 15px;">"A pragmatic builder who leverages modern AI tooling to streamline developer branding."</p>
+        <div id="skills-container" style="margin-bottom: 15px;">
+            <span class="badge" style="background:#0366d6; color:white; padding:4px 8px; border-radius:12px; margin-right:5px; font-size:12px;">Python</span><span class="badge" style="background:#0366d6; color:white; padding:4px 8px; border-radius:12px; margin-right:5px; font-size:12px;">React</span><span class="badge" style="background:#0366d6; color:white; padding:4px 8px; border-radius:12px; margin-right:5px; font-size:12px;">FastAPI</span>
         </div>
         <div style="display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 15px; border-top: 1px solid #eee; padding-top: 10px;">
-            <span><strong>0</strong> Repos</span>
-            <span><strong>0</strong> Followers</span>
-            <span><strong>Builder</strong></span>
+            <span id="stat-repos"><strong>1</strong> Repos</span>
+            <span id="stat-followers"><strong>1</strong> Followers</span>
+            <span id="stat-stars"><strong>0</strong> Stars</span>
         </div>
         <div style="font-size: 13px;">
             <h4 style="margin: 0 0 10px 0; color: #0366d6;">Top Repositories</h4>
-            
+            <div id="repos-container">
+                <div style="margin-top:10px; border-bottom:1px solid #eee; padding-bottom:5px;"><strong>github-dev-card</strong> ⭐0 🍴0<br/><small>An AI-powered full-stack application built as a project for the GeeksforGeeks x Google workshop. It uses an autonomous AI agent to scrape a user's profile and generate a customized, shareable developer card. Built with React, FastAPI, MCP, and Docker.</small></div>
+            </div>
         </div>
-        <p style="margin-top: 15px; font-size: 11px; opacity: 0.6; text-align: center;">Fun Fact: With exactly zero public repositories, Jasmin is keeping their master plan entirely under wraps for now.</p>
+        <p style="margin-top: 15px; font-size: 11px; opacity: 0.6; text-align: center;">Fun Fact: Jasmin is a workshop innovator who believes in automating the process of showing off developer stats.</p>
+        <div id="hidden-stats" style="display:none;" data-total-stars="0" data-total-forks="0"></div>
     </div>
     
     </body>

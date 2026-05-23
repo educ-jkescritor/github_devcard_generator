@@ -3,60 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GitHub Dev Card Generator</title>
+    <title>GitHub Dev Card Generator - Final Production</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <!-- React & Framer Motion CDN -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
     <style>
         :root {
             --bg-color: #0d1117;
-            --bg-gradient: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
+            --bg-gradient: radial-gradient(circle at center, #1a1f26 0%, #0d1117 100%);
             --container-bg: #161b22;
             --text-primary: #f0f6fc;
             --text-secondary: #8b949e;
-            --accent-color: #238636;
-            --accent-hover: #2ea043;
+            --accent-color: #f0f6fc;
+            --accent-hover: #ffffff;
             --border-color: #30363d;
-            --card-gold: #d4af37;
-            --error-color: #f85149;
+            
+            /* Metallic Tiers Base Colors */
+            --tier-legendary: #ffd700;
+            --tier-epic: #c084fc;
+            --tier-rare: #60a5fa;
+            --tier-uncommon: #4ade80;
+            --tier-common: #ffffff;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
             font-family: 'Inter', sans-serif;
             background: var(--bg-gradient);
             color: var(--text-primary);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-            perspective: 1200px;
+            margin: 0;
+            display: flex; justify-content: center; align-items: center;
+            overflow: hidden; perspective: 2500px;
         }
 
         .app-container {
-            width: 100%;
-            max-width: 600px;
-            text-align: center;
-            padding: 20px;
+            width: 100%; max-width: 600px; text-align: center;
             position: relative;
-        }
-
-        /* Views */
-        .view {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            animation: fadeIn 0.5s ease-out forwards;
-        }
-
-        .view.active {
             display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh; /* Master centering logic */
+        }
+
+        .view {
+            display: flex; flex-direction: column; align-items: center;
+            animation: fadeIn 0.5s ease-out forwards;
+            width: 100%;
+        }
+
+        /* Loading Animation: Base Styling (Motion-driven) */
+        .loading-container { margin-top: 20px; }
+        .pulse-loader { 
+            width: 60px; height: 60px; 
+            background-color: #fff; border-radius: 50%; 
+            margin: 0 auto 30px; 
+        }
+
+        /* Results Centering Container: Perfect Vertical Balance */
+        .results-view {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 48px;
+            padding: 64px 0;
+            box-sizing: border-box;
+            width: 100%;
         }
 
         @keyframes fadeIn {
@@ -65,375 +87,433 @@
         }
 
         h1 {
-            font-size: 2.5rem;
-            font-weight: 800;
-            margin-bottom: 10px;
-            letter-spacing: -1px;
+            font-size: 2.5rem; font-weight: 800; margin-bottom: 10px; letter-spacing: -1px;
+            background: linear-gradient(180deg, #fff 0%, #8b949e 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
 
-        .subheading {
-            color: var(--text-secondary);
-            margin-bottom: 40px;
-            font-size: 1.1rem;
-        }
+        .subheading { color: var(--text-secondary); margin-bottom: 40px; font-size: 1.1rem; }
 
-        /* Input View */
         .input-group {
-            display: flex;
-            gap: 10px;
-            background: var(--container-bg);
-            padding: 10px;
-            border-radius: 16px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-            width: 100%;
-            max-width: 450px;
-            margin: 0 auto;
+            display: flex; gap: 10px; background: rgba(22, 27, 34, 0.8);
+            backdrop-filter: blur(10px); padding: 10px; border-radius: 16px;
+            border: 1px solid var(--border-color); box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            width: 100%; max-width: 450px; margin: 0 auto;
         }
 
         input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            color: var(--text-primary);
-            padding: 12px 16px;
-            font-size: 1rem;
-            outline: none;
+            flex: 1; background: transparent; border: none; color: var(--text-primary);
+            padding: 12px 16px; font-size: 1rem; outline: none;
         }
-
         input::placeholder { color: #484f58; }
 
         button.primary-btn {
-            background-color: var(--accent-color);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            background-color: #fff; color: #000; border: none; padding: 12px 24px;
+            border-radius: 12px; font-weight: 700; cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
         button.primary-btn:hover {
-            background-color: var(--accent-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(35, 134, 54, 0.3);
+            background-color: #e2e8f0; transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
         }
 
-        button:disabled { opacity: 0.6; cursor: not-allowed; }
-
-        /* Loading */
-        .loading-container { margin-top: 20px; }
-        .pulse-loader {
-            width: 60px; height: 60px; background-color: var(--accent-color); border-radius: 50%;
-            animation: pulse 1.5s ease-in-out infinite; margin: 0 auto 20px;
-        }
-        @keyframes pulse {
-            0% { transform: scale(0.8); opacity: 0.5; }
-            50% { transform: scale(1.2); opacity: 1; }
-            100% { transform: scale(0.8); opacity: 0.5; }
-        }
-
-        /* Error View */
-        #error-message {
-            color: var(--error-color);
-            background: rgba(248, 81, 73, 0.1);
-            padding: 15px;
-            border-radius: 12px;
-            border: 1px solid rgba(248, 81, 73, 0.2);
-            margin-top: 20px;
-            display: none;
-            font-size: 0.9rem;
-            max-width: 450px;
-        }
-
-        /* Trading Card Component Styles */
-        .card-container {
-            width: 100%;
+        .dynamic-tier-header {
             display: flex;
-            justify-content: center;
-            margin-top: 20px;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            animation: tierFadeIn 1.2s ease-out 1.2s forwards;
+            opacity: 0;
+        }
+        .header-main-title {
+            font-size: 2.2rem; font-weight: 800; letter-spacing: 6px; 
+            text-transform: uppercase;
+            line-height: 1;
+        }
+        .header-sub-title {
+            font-size: 0.95rem; font-weight: 700; letter-spacing: 4px;
+            opacity: 0.7; text-transform: uppercase;
+            margin-top: 4px;
+        }
+
+        @keyframes tierFadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card-container {
+            width: 100%; display: flex; justify-content: center;
+            perspective: 2500px;
         }
 
         .trading-card {
-            width: 350px;
-            background: #1c2128;
-            border: 10px solid var(--card-gold);
-            border-radius: 20px;
-            padding: 12px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5), inset 0 0 20px rgba(0,0,0,0.3);
-            position: relative;
-            overflow: hidden;
-            text-align: left;
+            width: 360px; height: 500px; background: #000;
+            border: 14px solid #fff; border-radius: 32px; position: relative;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.9);
             transform-style: preserve-3d;
-            backface-visibility: hidden;
-            transition: transform 0.1s ease-out;
-            color: #f0f6fc;
+            overflow: hidden;
         }
 
         .card-entrance {
-            animation: revealCard 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            animation: tcgReveal 2.2s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;
+            transform-origin: center center;
         }
 
-        @keyframes revealCard {
-            0% { opacity: 0; transform: scale(0.3) rotateY(720deg); }
-            100% { opacity: 1; transform: scale(1) rotateY(0deg); }
+        @keyframes tcgReveal {
+            0% { opacity: 1; transform: scale(0.4) rotateY(-720deg) rotateX(30deg) translateZ(-800px); filter: brightness(3) blur(15px); }
+            15% { filter: brightness(1.5) blur(5px); transform: scale(0.6) rotateY(-360deg) rotateX(-15deg) translateZ(0); }
+            100% { transform: scale(1) rotateY(0deg) rotateX(0deg) translateZ(0); filter: brightness(1) blur(0px); }
         }
 
-        .glare {
+        .card-layers {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 1;
+            border-radius: 20px; overflow: hidden;
+        }
+        .layer-base { position: absolute; inset: 0; transition: background 0.5s ease; box-shadow: inset 0 0 120px rgba(255,255,255,0.08); }
+        .layer-pattern { position: absolute; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px); background-size: 32px 32px; opacity: 0.8; }
+        .glare-flash { position: absolute; inset: -100%; background: linear-gradient(110deg, transparent 40%, rgba(255,255,255,0.8) 50%, transparent 60%); z-index: 5; animation: tcgFlash 2.2s cubic-bezier(0.1, 0.9, 0.2, 1) forwards; pointer-events: none; }
+        @keyframes tcgFlash { 0% { transform: translateX(-100%) rotate(25deg); opacity: 0; } 10% { opacity: 1; } 30% { transform: translateX(100%) rotate(25deg); opacity: 0; } 100% { transform: translateX(100%) rotate(25deg); opacity: 0; } }
+        .glare-spotlight { position: absolute; inset: 0; background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.4) 0%, transparent 60%); z-index: 4; mix-blend-mode: overlay; transition: opacity 0.5s ease; pointer-events: none; }
+
+        /* Diagonal Foil Shine Sweep: Post-Reveal Polish */
+        .foil-sweep {
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0) 100%);
-            background-size: 200% 200%;
+            inset: -100%;
+            background: linear-gradient(
+                110deg,
+                transparent 35%,
+                rgba(255, 255, 255, 0.1) 42%,
+                rgba(255, 255, 255, 0.6) 45%,
+                rgba(255, 255, 255, 0.1) 48%,
+                transparent 55%
+            );
+            z-index: 6;
             pointer-events: none;
-            z-index: 10;
             opacity: 0;
-            transition: opacity 0.3s;
-        }
-        .trading-card:hover .glare { opacity: 1; }
-
-        .card-header { 
-            display: flex; align-items: center; justify-content: space-between; 
-            margin-bottom: 10px; padding: 6px 10px; background: rgba(255,255,255,0.05); 
-            border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); 
-        }
-        .profile-pic { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--card-gold); object-fit: cover; }
-        .username-label { font-weight: 800; font-size: 1.1rem; color: #fff; }
-        .stat-badge { font-size: 0.8rem; font-weight: 700; color: var(--card-gold); text-transform: uppercase; }
-
-        .art-box {
-            height: 180px; margin: 8px 0; border: 4px solid #30363d; border-radius: 8px; padding: 15px;
-            display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
-            position: relative; background: linear-gradient(135deg, #1e293b, #0f172a);
-            box-shadow: inset 0 0 30px rgba(0,0,0,0.5);
-        }
-        .bio-text { font-size: 0.9rem; font-style: italic; line-height: 1.4; color: #e6edf3; }
-        .lang-tag { 
-            position: absolute; bottom: 10px; right: 10px; background: var(--card-gold); 
-            color: #000; padding: 2px 8px; border-radius: 4px; font-weight: 800; 
-            font-size: 0.7rem; text-transform: uppercase; 
+            transform: translateX(-100%) rotate(25deg);
+            animation: foilShine 1.4s cubic-bezier(0.4, 0, 0.2, 1) 1.2s forwards;
         }
 
-        .abilities-section { padding: 8px 4px; }
+        @keyframes foilShine {
+            0% { transform: translateX(-100%) rotate(25deg); opacity: 0; }
+            20% { opacity: 0.8; }
+            80% { opacity: 0.8; }
+            100% { transform: translateX(100%) rotate(25deg); opacity: 0; }
+        }
+
+        .card-content {
+            position: relative; z-index: 10; padding: 22px 22px 48px 22px; height: 100%;
+            display: flex; flex-direction: column; color: #fff;
+            text-shadow: 0 2px 10px rgba(0,0,0,1); transform-style: preserve-3d;
+        }
+
+        .card-header-compact { 
+            display: flex; align-items: center; gap: 16px; 
+            margin-bottom: 20px; padding: 14px 16px; 
+            background: rgba(255,255,255,0.05); backdrop-filter: blur(12px);
+            border-radius: 20px; border: 1px solid rgba(255,255,255,0.15); 
+        }
+        .header-content { display: flex; flex-direction: column; justify-content: center; gap: 4px; }
+        .profile-pic { width: 50px; height: 50px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 20px rgba(255,255,255,0.3); flex-shrink: 0; }
+        .username-label { font-weight: 800; font-size: 1.25rem; color: #fff; letter-spacing: -0.5px; line-height: 1; }
+        .stats-row { font-size: 0.7rem; font-weight: 800; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px; }
+
+        .repos-section-expanded { flex-grow: 1; padding: 0 10px; margin-bottom: 4px; }
         .section-title { 
-            font-size: 0.7rem; font-weight: 800; color: var(--text-secondary); 
-            text-transform: uppercase; border-bottom: 1px solid #30363d; margin-bottom: 10px; padding-bottom: 2px;
+            font-size: 0.7rem; font-weight: 800; color: rgba(255,255,255,0.5); 
+            text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.15); margin-bottom: 16px; padding-bottom: 8px;
+            letter-spacing: 2px;
         }
-        .ability { margin-bottom: 12px; }
-        .ability-header { display: flex; justify-content: space-between; align-items: center; }
-        .ability-name { font-weight: 700; font-size: 0.9rem; color: var(--accent-hover); }
-        .ability-hp { font-size: 0.7rem; color: var(--card-gold); font-weight: 800; }
-        .ability-desc { font-size: 0.75rem; color: var(--text-secondary); margin-top: 2px; line-height: 1.3; }
-        .ability-stats { font-size: 0.7rem; color: #f0f6fc; margin-top: 4px; font-weight: 600; opacity: 0.8; }
+        .repo-item { margin-bottom: 18px; }
+        .repo-name { font-weight: 800; font-size: 1rem; color: #fff; margin-bottom: 4px; }
+        .repo-desc { font-size: 0.75rem; color: rgba(255,255,255,0.6); line-height: 1.4; margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .repo-stars { font-size: 0.75rem; font-weight: 800; opacity: 0.9; color: #fff; }
 
-        .card-footer { 
-            margin-top: 10px; display: flex; justify-content: space-between; align-items: center; 
-            padding: 0 5px; opacity: 0.6;
-        }
-        .auth-stamp { 
-            font-size: 0.6rem; font-weight: 800; color: #fff; text-transform: uppercase; 
-            letter-spacing: 1px; border: 1px solid rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 4px; 
-        }
-        .rarity-star { color: var(--card-gold); font-size: 1.2rem; }
+        .stack-footer-expanded { padding: 0 10px; margin-bottom: 18px; }
+        .stack-list { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-start; }
+        .stack-tag { background: #fff; color: #000; padding: 4px 12px; border-radius: 6px; font-weight: 800; font-size: 0.65rem; text-transform: uppercase; box-shadow: 0 4px 10px rgba(255,255,255,0.1); white-space: nowrap; }
 
-        .reset-btn { margin-top: 30px; background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); }
+        .card-anchor-footer { 
+            margin-top: auto; display: flex; align-items: flex-end; padding: 0 10px; opacity: 0.5;
+            position: relative; height: 32px;
+        }
+        .auth-stamp { font-size: 0.6rem; font-weight: 800; letter-spacing: 2px; line-height: 1; }
+        .rarity-icon { 
+            font-size: 1.8rem; 
+            position: absolute;
+            bottom: -10px; right: 0px; line-height: 1;
+        }
+
+        .reset-btn { background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); cursor: pointer; }
         .reset-btn:hover { background: #21262d; color: var(--text-primary); }
+
+        .loading-container { margin-top: 20px; }
+        .pulse-loader { width: 60px; height: 60px; background-color: #fff; border-radius: 50%; animation: pulse 1.5s ease-in-out infinite; margin: 0 auto 20px; box-shadow: 0 0 30px rgba(255, 255, 255, 0.3); }
 
     </style>
 </head>
 <body>
-    <div class="app-container">
-        <!-- Input View -->
-        <div id="view-input" class="view active">
-            <h1>Dev Card Generator</h1>
-            <p class="subheading">Mint a real trading card of any GitHub developer</p>
-            <div class="input-group">
-                <input type="text" id="username-input" placeholder="e.g. torvalds" spellcheck="false" autocomplete="off">
-                <button class="primary-btn" id="generate-btn" onclick="processGeneration()">Generate</button>
-            </div>
-            <div id="error-message"></div>
-        </div>
+    <div id="root"></div>
 
-        <!-- Loading View -->
-        <div id="view-loading" class="view">
-            <div class="loading-container">
-                <div class="pulse-loader"></div>
-                <p class="subheading" id="loading-text">Scraping GitHub ecosystem...</p>
-            </div>
-        </div>
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const { motion, useMotionValue, useTransform, useSpring } = window.Motion;
 
-        <!-- Results View -->
-        <div id="view-results" class="view">
-            <h1>Generation Complete</h1>
-            <p class="subheading">You revealed a Rare Developer card!</p>
-            <div id="card-render-area" class="card-container"></div>
-            <button class="primary-btn reset-btn" onclick="resetFlow()">Generate Another</button>
-        </div>
-    </div>
+        // --- PRODUCTION CONFIGURATION ---
+        const USE_MOCK_DATA = false; 
 
-    <script>
-        let BACKEND_URL = '${BACKEND_URL}';
-        if (BACKEND_URL.startsWith('$') || !BACKEND_URL) {
-            if (window.location.protocol === 'file:') {
-                BACKEND_URL = 'http://localhost:8080';
-            } else if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-                BACKEND_URL = 'http://localhost:8080';
-            } else {
-                BACKEND_URL = window.location.protocol + "//" + window.location.hostname + ":8080";
-            }
-        }
-
-        const langColorMap = {
-            'C': '#555555', 'JavaScript': '#f1e05a', 'TypeScript': '#3178c6',
-            'Python': '#3572A5', 'Rust': '#dea584', 'Go': '#00ADD8', 'Java': '#b07219'
+        const MOCK_DATA = {
+            username: "hologram-architect",
+            name: "Silas Vane",
+            avatar: "https://i.pravatar.cc/150?u=hologram-architect",
+            followers: 1840,
+            publicRepos: 64,
+            totalStars: 4250,
+            totalForks: 412,
+            primaryLang: "Rust",
+            skills: ["Rust", "TypeScript", "WebGPU", "C++", "Three.js", "React", "Python"],
+            repos: [
+                { name: "BackTrack", stars: 4200, desc: "A high-performance system monitoring tool for hyper-scaling cloud environments." },
+                { name: "quantum-render-core", stars: 1240, desc: "A distributed path-tracing engine leveraging hardware-accelerated ray tracing." }
+            ]
         };
 
-        function switchView(id) {
-            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
+        let BACKEND_URL = '${BACKEND_URL}';
+        if (BACKEND_URL.startsWith('$') || !BACKEND_URL) {
+            BACKEND_URL = 'http://localhost:8080';
         }
 
-        function showError(msg) {
-            const err = document.getElementById('error-message');
-            err.innerText = msg;
-            err.style.display = "block";
-            switchView('view-input');
+        const calculateRarityTier = (followers, stars, repos, forks) => {
+            if (followers > 1000 || stars > 3000) return "Legendary";
+            if (followers > 500 || stars > 1000) return "Epic";
+            if (followers > 100 || stars > 300) return "Rare";
+            if (followers > 30 || repos > 50) return "Uncommon";
+            return "Common";
         }
 
-        async function processGeneration() {
-            const input = document.getElementById('username-input');
-            const btn = document.getElementById('generate-btn');
-            const targetUsername = input.value.trim();
-            if (!targetUsername) return;
+        const formatNum = (num) => num >= 1000 ? (num / 1000).toFixed(1) + 'k' : num;
 
-            btn.disabled = true;
-            document.getElementById('error-message').style.display = "none";
-            switchView('view-loading');
+        const DevCard = ({ data, isHovering, setIsHovering, mousePos, setMousePos, rotateX, rotateY }) => {
+            const [isEntering, setIsEntering] = useState(true);
+            useEffect(() => {
+                const timer = setTimeout(() => setIsEntering(false), 2200);
+                return () => clearTimeout(timer);
+            }, []);
 
-            try {
-                // 1. Trigger Backend Agent
-                const response = await fetch(`${BACKEND_URL}/generate`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username: targetUsername })
-                });
+            const handleMouseMove = (e) => {
+                if (isEntering) return;
+                const rect = e.currentTarget.getBoundingClientRect();
+                const width = rect.width;
+                const height = rect.height;
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+                setMousePos({ x: (mouseX / width) * 100, y: (mouseY / height) * 100, rawX: mouseX / width - 0.5, rawY: mouseY / height - 0.5 });
+            };
 
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.detail || "Generation failed.");
+            const tierStyles = {
+                "Legendary": { accent: "#ffd700", bg: "linear-gradient(135deg, #b8860b 0%, #453500 100%)" },
+                "Epic": { accent: "#c084fc", bg: "linear-gradient(135deg, #581c87 0%, #2e1065 100%)" },
+                "Rare": { accent: "#60a5fa", bg: "linear-gradient(135deg, #1e3a8a 0%, #172554 100%)" },
+                "Uncommon": { accent: "#4ade80", bg: "linear-gradient(135deg, #065f46 0%, #022c22 100%)" },
+                "Common": { accent: "#ffffff", bg: "linear-gradient(135deg, #334155 0%, #0f172a 100%)" }
+            };
+            const currentStyle = tierStyles[data.tier] || tierStyles["Common"];
+
+            return (
+                <div className="card-container">
+                    <motion.div 
+                        className="trading-card card-entrance"
+                        onMouseMove={handleMouseMove}
+                        onMouseLeave={() => setIsHovering(false)}
+                        onMouseEnter={() => !isEntering && setIsHovering(true)}
+                        style={{ rotateX, rotateY, "--mouse-x": `${mousePos.x}%`, "--mouse-y": `${mousePos.y}%` }}
+                    >
+                        <div className="card-layers">
+                            <div className="layer-base" style={{ background: currentStyle.bg }}></div>
+                            <div className="layer-pattern"></div>
+                            <div className="glare-flash"></div>
+                            <div className="foil-sweep"></div>
+                            <div className="glare-spotlight" style={{ opacity: isHovering ? 1 : 0 }}></div>
+                        </div>
+                        <div className="card-content">
+                            <div className="card-header-compact" style={{ transform: "translateZ(40px)" }}>
+                                <img src={data.avatar} className="profile-pic" alt="Avatar" />
+                                <div className="header-content">
+                                    <div className="username-label">{data.username}</div>
+                                    <div className="stats-row">
+                                        <span>{formatNum(data.followers)} FLW</span>
+                                        <span style={{ opacity: 0.4 }}>•</span>
+                                        <span>{formatNum(data.totalStars)} STR</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="repos-section-expanded" style={{ transform: "translateZ(30px)" }}>
+                                <div className="section-title">Latest Repositories</div>
+                                {data.repos.slice(0, 2).map((r, i) => (
+                                    <div className="repo-item" key={i}>
+                                        <div className="repo-name">{r.name}</div>
+                                        <div className="repo-desc">{r.desc}</div>
+                                        <div className="repo-stars">⭐ {r.stars} STARS</div>
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="stack-footer-expanded" style={{ transform: "translateZ(25px)" }}>
+                                <div className="section-title">Top Stack</div>
+                                <div className="stack-list">
+                                    {data.skills.slice(0, 3).map((s, i) => (
+                                        <span className="stack-tag" key={i}>{s}</span>
+                                    ))}
+                                </div>
+                            </div>
+                            <div className="card-anchor-footer" style={{ transform: "translateZ(20px)" }}>
+                                <div className="auth-stamp">{data.publicRepos} REPOS / {data.totalForks} FORKS</div>
+                                <div className="rarity-icon" style={{ color: currentStyle.accent }}>✧</div>
+                            </div>
+                        </div>
+                    </motion.div>
+                </div>
+            );
+        };
+
+        const App = () => {
+            const [view, setView] = useState('input');
+            const [username, setUsername] = useState('');
+            const [cardData, setCardData] = useState(null);
+
+            // Physics State
+            const x = useMotionValue(0);
+            const y = useMotionValue(0);
+            const mouseXSpring = useSpring(x, { stiffness: 300, damping: 20 });
+            const mouseYSpring = useSpring(y, { stiffness: 300, damping: 20 });
+            const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], [8, -8]);
+            const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], [-8, 8]);
+            const [isHovering, setIsHovering] = useState(false);
+            const [mousePos, setMousePos] = useState({ x: 50, y: 50, rawX: 0, rawY: 0 });
+
+            useEffect(() => {
+                x.set(mousePos.rawX);
+                y.set(mousePos.rawY);
+                if (!isHovering) { x.set(0); y.set(0); }
+            }, [mousePos, isHovering]);
+
+            const processGeneration = async () => {
+                const targetUsername = username.trim();
+                if (!targetUsername && !USE_MOCK_DATA) return;
+                setView('loading');
+
+                if (USE_MOCK_DATA) {
+                    setTimeout(() => {
+                        const data = { ...MOCK_DATA };
+                        data.tier = calculateRarityTier(data.followers, data.totalStars, data.publicRepos, data.totalForks);
+                        setCardData(data);
+                        setView('results');
+                    }, 800);
+                    return;
                 }
 
-                document.getElementById('loading-text').innerText = "Analyzing metadata...";
+                try {
+                    const response = await fetch(`${BACKEND_URL}/generate`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: targetUsername }) });
+                    if (!response.ok) throw new Error("Generation failed.");
 
-                // 2. Fetch the generated card to extract real data
-                const cardResp = await fetch(`${BACKEND_URL}/card/${targetUsername}`);
-                if (!cardResp.ok) throw new Error("Failed to retrieve generated card data.");
-                
-                const cardHtml = await cardResp.text();
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(cardHtml, 'text/html');
-                
-                // 3. Extract STRICTLY from the generated ecosystem data
-                const realData = {
-                    username: targetUsername,
-                    name: doc.querySelector('h2')?.innerText || targetUsername,
-                    avatar: doc.querySelector('img')?.src || `https://github.com/${targetUsername}.png`,
-                    bio: doc.querySelector('p[style*="italic"]')?.innerText.replace(/"/g, '') || "No bio available.",
-                    followers: doc.querySelector('span:nth-child(2) strong')?.innerText || "0",
-                    primaryLang: doc.querySelector('.badge')?.innerText || "Coding",
-                    repos: []
-                };
+                    const cardResp = await fetch(`${BACKEND_URL}/card/${targetUsername}`);
+                    const cardHtml = await cardResp.text();
+                    const doc = new DOMParser().parseFromString(cardHtml, 'text/html');
+                    
+                    const getCleanNum = (id) => {
+                        const el = doc.getElementById(id);
+                        if (!el) return 0;
+                        const clean = el.innerText.replace(/[^0-9]/g, '');
+                        return parseInt(clean) || 0;
+                    };
 
-                // Extract Repos
-                const repoElements = doc.querySelectorAll('div[style*="border-bottom"]');
-                repoElements.forEach(el => {
-                    const name = el.querySelector('strong')?.innerText || "Unknown Repo";
-                    const stars = el.innerText.match(/⭐(\d+)/)?.[1] || "0";
-                    const desc = el.querySelector('small')?.innerText || "";
-                    realData.repos.push({ name, stars, desc });
-                });
+                    const hiddenStats = doc.getElementById('hidden-stats');
+                    const followers = getCleanNum('stat-followers');
+                    const publicRepos = getCleanNum('stat-repos');
+                    const totalStars = parseInt(hiddenStats?.getAttribute('data-total-stars')) || 0;
+                    const totalForks = parseInt(hiddenStats?.getAttribute('data-total-forks')) || 0;
 
-                // Final Step: Render Premium Card
-                renderPremiumCard(realData);
-                switchView('view-results');
+                    const realData = {
+                        username: targetUsername,
+                        avatar: doc.querySelector('img')?.src || `https://github.com/${targetUsername}.png`,
+                        followers,
+                        publicRepos,
+                        totalStars,
+                        totalForks,
+                        skills: Array.from(doc.querySelectorAll('.badge')).map(el => el.innerText),
+                        repos: Array.from(doc.querySelectorAll('#repos-container > div')).map(el => ({
+                            name: el.querySelector('strong')?.innerText || "Repo",
+                            desc: el.querySelector('small')?.innerText || "",
+                            stars: parseInt(el.innerText.match(/⭐(\d+)/)?.[1]) || 0
+                        }))
+                    };
+                    
+                    realData.tier = calculateRarityTier(realData.followers, realData.totalStars, realData.publicRepos, realData.totalForks);
+                    setCardData(realData);
+                    setView('results');
+                } catch (err) {
+                    console.error(err);
+                    setView('input');
+                }
+            };
 
-            } catch (err) {
-                console.error(err);
-                showError("Error: " + err.message);
-            } finally {
-                btn.disabled = false;
-            }
-        }
+            const tierColors = { "Legendary": "#ffd700", "Epic": "#c084fc", "Rare": "#60a5fa", "Uncommon": "#4ade80", "Common": "#ffffff" };
+            const tierColor = cardData ? (tierColors[cardData.tier] || tierColors["Common"]) : tierColors["Common"];
 
-        function renderPremiumCard(data) {
-            const area = document.getElementById('card-render-area');
-            const langColor = langColorMap[data.primaryLang] || '#1e293b';
-
-            area.innerHTML = `
-                <div class="trading-card card-entrance" id="dev-trading-card">
-                    <div class="glare" id="card-glare"></div>
-                    <div class="card-header">
-                        <div style="display:flex; align-items:center; gap:10px;">
-                            <img src="${data.avatar}" class="profile-pic" alt="Avatar">
-                            <span class="username-label">${data.username}</span>
-                        </div>
-                        <span class="stat-badge">${data.followers} Followers</span>
-                    </div>
-                    <div class="art-box" style="background: linear-gradient(135deg, ${langColor}44, #0f172a); border-color: ${langColor}88;">
-                        <p class="bio-text">"${data.bio}"</p>
-                        <span class="lang-tag" style="background: ${langColor}; color: ${isColorLight(langColor) ? '#000' : '#fff'}">${data.primaryLang}</span>
-                    </div>
-                    <div class="abilities-section">
-                        <div class="section-title">Repositories & Abilities</div>
-                        ${data.repos.slice(0, 2).map(r => `
-                            <div class="ability">
-                                <div class="ability-header">
-                                    <span class="ability-name">${r.name}</span>
-                                    <span class="ability-hp">HP ${r.stars}</span>
-                                </div>
-                                <div class="ability-desc">${r.desc}</div>
-                                <div class="ability-stats">⭐ ${r.stars}</div>
+            return (
+                <div className="app-container">
+                    {view === 'input' && (
+                        <div className="view">
+                            <div style={{ marginBottom: '24px' }}>
+                                <h1 style={{ fontSize: '3.2rem', marginBottom: '0', lineHeight: '1' }}>GitHub</h1>
+                                <h1 style={{ fontSize: '1.8rem', marginTop: '8px', opacity: 0.8, letterSpacing: '2px' }}>Developer Card Generator</h1>
                             </div>
-                        `).join('')}
-                    </div>
-                    <div class="card-footer">
-                        <div class="auth-stamp">DEV-GEN-2026</div>
-                        <div class="rarity-star">★</div>
-                    </div>
+                            <div className="input-group">
+                                <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="GitHub Username" onKeyPress={(e) => e.key === 'Enter' && processGeneration()} />
+                                <button className="primary-btn" onClick={processGeneration}>Generate Card</button>
+                            </div>
+                        </div>
+                    )}
+                    {view === 'loading' && (
+                        <div className="view">
+                            <div className="loading-container">
+                                <motion.div 
+                                    className="pulse-loader"
+                                    animate={{ 
+                                        scale: [1, 1.2, 1],
+                                        opacity: [0.6, 1, 0.6],
+                                        boxShadow: [
+                                            "0 0 20px rgba(255, 255, 255, 0.2)",
+                                            "0 0 60px rgba(255, 255, 255, 0.6)",
+                                            "0 0 20px rgba(255, 255, 255, 0.2)"
+                                        ]
+                                    }}
+                                    transition={{ 
+                                        duration: 1.2, 
+                                        repeat: Infinity, 
+                                        ease: "easeInOut" 
+                                    }}
+                                />
+                                <p className="subheading" style={{ fontSize: '2rem', letterSpacing: '4px' }}>...</p>
+                            </div>
+                        </div>
+                    )}
+                    {view === 'results' && cardData && (
+                        <div className="view results-view" style={{ minHeight: '100vh', justifyContent: 'center' }}>
+                            <div className="dynamic-tier-header" style={{ color: tierColor }}>
+                                <div className="header-main-title">CARD REVEALED</div>
+                                <div className="header-sub-title">{cardData.tier} Card</div>
+                            </div>
+                            <DevCard data={cardData} isHovering={isHovering} setIsHovering={setIsHovering} mousePos={mousePos} setMousePos={setMousePos} rotateX={rotateX} rotateY={rotateY} />
+                            <button className="primary-btn reset-btn" onClick={() => { setCardData(null); setView('input'); }}>Mint Another</button>
+                        </div>
+                    )}
                 </div>
-            `;
-            initPhysics();
-        }
+            );
+        };
 
-        function initPhysics() {
-            const card = document.getElementById('dev-trading-card');
-            const glare = document.getElementById('card-glare');
-            if (!card) return;
-            card.addEventListener('mousemove', (e) => {
-                const rect = card.getBoundingClientRect();
-                const x = e.clientX - rect.left, y = e.clientY - rect.top;
-                const centerX = rect.width/2, centerY = rect.height/2;
-                const rotateX = ((centerY - y) / centerY) * 15, rotateY = ((x - centerX) / centerX) * 15;
-                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`;
-                glare.style.backgroundPosition = `${100 - (x/rect.width)*100}% ${100 - (y/rect.height)*100}%`;
-            });
-            card.addEventListener('mouseleave', () => {
-                card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)`;
-            });
-        }
-
-        function isColorLight(color) {
-            const hex = color.replace('#', '');
-            const r = parseInt(hex.substr(0, 2), 16), g = parseInt(hex.substr(2, 2), 16), b = parseInt(hex.substr(4, 2), 16);
-            return ((r * 299) + (g * 587) + (b * 114)) / 1000 > 155;
-        }
-
-        function resetFlow() {
-            document.getElementById('username-input').value = "";
-            switchView('view-input');
-        }
-
-        document.getElementById('username-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') processGeneration(); });
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
     </script>
 </body>
 </html>

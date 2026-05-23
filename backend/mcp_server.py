@@ -67,16 +67,20 @@ def scrape_github(username: str) -> dict:
         print(f"[scrape_github] Retrieved {len(repos_list)} repositories")
         
         # Process Repos
+        total_stars = sum(r.get("stargazers_count", 0) for r in repos_list)
+        total_forks = sum(r.get("forks_count", 0) for r in repos_list)
+        
         top_repos = sorted(repos_list, key=lambda x: x.get("stargazers_count", 0), reverse=True)[:6]
         processed_repos = [
             {
                 "name": r["name"],
                 "stars": r["stargazers_count"],
+                "forks": r.get("forks_count", 0),
                 "language": r["language"],
                 "description": r["description"]
             } for r in top_repos
         ]
-        print(f"[scrape_github] Top repos: {[r['name'] for r in processed_repos]}")
+        print(f"[scrape_github] Total Stars: {total_stars}, Total Forks: {total_forks}")
         
         # Languages Aggregation
         languages = {}
@@ -96,6 +100,8 @@ def scrape_github(username: str) -> dict:
             "location": user_data.get("location"),
             "public_repos": user_data.get("public_repos"),
             "followers": user_data.get("followers"),
+            "total_stars": total_stars,
+            "total_forks": total_forks,
             "top_repos": processed_repos,
             "most_used_languages": [l[0] for l in sorted_languages[:5]]
         }
@@ -174,10 +180,10 @@ def generate_card_html(username: str, github_data: dict, analysis: dict) -> str:
     
     repos_html = "".join([
         f'<div style="margin-top:10px; border-bottom:1px solid #eee; padding-bottom:5px;">'
-        f'<strong>{r["name"]}</strong> ⭐{r["stars"]} <br/>'
+        f'<strong>{r["name"]}</strong> ⭐{r["stars"]} 🍴{r.get("forks", 0)}<br/>'
         f'<small>{r["description"] or "No description"}</small>'
         f'</div>'
-        for r in github_data.get("top_repos", [])[:3]
+        for r in github_data.get("top_repos", [])[:2]
     ])
     
     print(f"[generate_card_html] Theme: {theme}, Skills: {analysis.get('top_skills', [])}, Repos: {len(repos_html)}")
@@ -192,19 +198,22 @@ def generate_card_html(username: str, github_data: dict, analysis: dict) -> str:
             </div>
         </div>
         <p style="font-style: italic; margin-bottom: 15px;">"{analysis.get("developer_vibe")}"</p>
-        <div style="margin-bottom: 15px;">
+        <div id="skills-container" style="margin-bottom: 15px;">
             {skills_html}
         </div>
         <div style="display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 15px; border-top: 1px solid #eee; padding-top: 10px;">
-            <span><strong>{github_data.get("public_repos")}</strong> Repos</span>
-            <span><strong>{github_data.get("followers")}</strong> Followers</span>
-            <span><strong>{theme.title()}</strong></span>
+            <span id="stat-repos"><strong>{github_data.get("public_repos")}</strong> Repos</span>
+            <span id="stat-followers"><strong>{github_data.get("followers")}</strong> Followers</span>
+            <span id="stat-stars"><strong>{github_data.get("total_stars")}</strong> Stars</span>
         </div>
         <div style="font-size: 13px;">
             <h4 style="margin: 0 0 10px 0; color: {t["accent"]};">Top Repositories</h4>
-            {repos_html}
+            <div id="repos-container">
+                {repos_html}
+            </div>
         </div>
         <p style="margin-top: 15px; font-size: 11px; opacity: 0.6; text-align: center;">Fun Fact: {analysis.get("fun_fact")}</p>
+        <div id="hidden-stats" style="display:none;" data-total-stars="{github_data.get("total_stars")}" data-total-forks="{github_data.get("total_forks")}"></div>
     </div>
     """
     print(f"[generate_card_html] SUCCESS: Generated HTML card")
