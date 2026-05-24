@@ -6,7 +6,7 @@
     <title>GitHub Dev Card Generator - Final Production</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     
     <!-- React & Framer Motion CDN -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
@@ -16,27 +16,27 @@
 
     <style>
         :root {
-            --bg-color: #0d1117;
-            --bg-gradient: radial-gradient(circle at center, #1a1f26 0%, #0d1117 100%);
-            --container-bg: #161b22;
-            --text-primary: #f0f6fc;
-            --text-secondary: #8b949e;
-            --accent-color: #f0f6fc;
-            --accent-hover: #ffffff;
-            --border-color: #30363d;
+            --bg-color: #eef2f6;
+            --bg-gradient: radial-gradient(circle at center, #f8fafc 0%, #eef2f6 100%);
+            --container-bg: #ffffff;
+            --text-primary: #1a202c;
+            --text-secondary: #4a5568;
+            --accent-color: #1a202c;
+            --accent-hover: #000000;
+            --border-color: #e2e8f0;
             
             /* Metallic Tiers Base Colors */
             --tier-legendary: #ffd700;
             --tier-epic: #c084fc;
             --tier-rare: #60a5fa;
             --tier-uncommon: #4ade80;
-            --tier-common: #ffffff;
+            --tier-common: #1a202c;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Roboto', sans-serif;
             background: var(--bg-gradient);
             color: var(--text-primary);
             min-height: 100vh;
@@ -52,7 +52,7 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            min-height: 100vh; /* Master centering logic */
+            min-height: 100vh;
         }
 
         .view {
@@ -61,24 +61,17 @@
             width: 100%;
         }
 
-        /* Loading Animation: Base Styling (Motion-driven) */
-        .loading-container { margin-top: 20px; }
-        .pulse-loader { 
-            width: 60px; height: 60px; 
-            background-color: #fff; border-radius: 50%; 
-            margin: 0 auto 30px; 
-        }
-
-        /* Results Centering Container: Perfect Vertical Balance */
+        /* Results Centering Container */
         .results-view {
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            gap: 48px;
-            padding: 64px 0;
+            gap: 24px;
+            padding: 20px 0;
             box-sizing: border-box;
             width: 100%;
+            height: 100vh;
         }
 
         @keyframes fadeIn {
@@ -87,76 +80,175 @@
         }
 
         h1 {
-            font-size: 2.5rem; font-weight: 800; margin-bottom: 10px; letter-spacing: -1px;
-            background: linear-gradient(180deg, #fff 0%, #8b949e 100%);
+            font-size: 2.2rem; font-weight: 800; margin-bottom: 8px; letter-spacing: -1px;
+            background: linear-gradient(180deg, #1a202c 0%, #4a5568 100%);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
 
-        .subheading { color: var(--text-secondary); margin-bottom: 40px; font-size: 1.1rem; }
-
-        .input-group {
-            display: flex; gap: 10px; background: rgba(22, 27, 34, 0.8);
-            backdrop-filter: blur(10px); padding: 10px; border-radius: 16px;
-            border: 1px solid var(--border-color); box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-            width: 100%; max-width: 450px; margin: 0 auto;
+        /* Landing Form Redesign: Dynamic Vertical Stack */
+        .landing-form-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            width: 100%;
+            max-width: 420px;
+            margin: 10px auto 0;
         }
 
-        input {
-            flex: 1; background: transparent; border: none; color: var(--text-primary);
-            padding: 12px 16px; font-size: 1rem; outline: none;
+        .engraved-input-wrapper {
+            background-color: #f1f5f9; /* Subtle light gray */
+            border-radius: 40px; /* Dramatic rounding for pill-shape */
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(0, 0, 0, 0.03);
+            transition: all 0.3s ease;
         }
-        input::placeholder { color: #484f58; }
+        .engraved-input-wrapper:focus-within {
+            background-color: #f8fafc;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
 
-        button.primary-btn {
-            background-color: #fff; color: #000; border: none; padding: 12px 24px;
-            border-radius: 12px; font-weight: 700; cursor: pointer;
+        .engraved-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: #1a202c;
+            padding: 18px 32px; /* Adjusted padding for pill-shape */
+            font-size: 1.1rem;
+            outline: none;
+            font-weight: 600;
+            text-align: center;
+        }
+        .engraved-input::placeholder {
+            color: #94a3b8;
+            font-weight: 800;
+            letter-spacing: 3px;
+            opacity: 0.5;
+            text-transform: uppercase;
+        }
+
+        .sleek-primary-btn {
+            background-color: #46f0ff;
+            color: #ffffff;
+            border: none;
+            padding: 14px 40px;
+            border-radius: 40px;
+            font-weight: 500;
+            cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 0.95rem;
+            letter-spacing: 1px;
+            width: fit-content;
+            align-self: center;
+            box-shadow: 0 4px 12px rgba(70, 240, 255, 0.2);
         }
-        button.primary-btn:hover {
-            background-color: #e2e8f0; transform: translateY(-2px);
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        .sleek-primary-btn:hover {
+            background-color: #2edfff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(70, 240, 255, 0.4);
+        }
+
+        /* Loading Card Component Styling: Compact Square */
+        .loading-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            border-radius: 24px;
+            width: 100px;
+            height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+            animation: loadingCardReveal 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+
+        @keyframes loadingCardReveal {
+            from { opacity: 0; transform: scale(0.9) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .dot-spinner {
+            position: relative;
+            width: 50px;
+            height: 50px;
+            animation: spin 3s linear infinite;
+        }
+        .dot-spinner div {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #00e5ff;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            margin-top: -3px;
+            margin-left: -3px;
+            animation: spectrumShift 3s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes spectrumShift {
+            0% { background: #00e5ff; filter: hue-rotate(0deg); }
+            100% { background: #00e5ff; filter: hue-rotate(360deg); }
         }
 
         .dynamic-tier-header {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 2px;
-            animation: tierFadeIn 1.2s ease-out 1.2s forwards;
+            gap: 0px;
+            animation: tierFadeIn 1.4s cubic-bezier(0.2, 0.8, 0.2, 1) 1.5s forwards;
             opacity: 0;
+            transform: scale(0.9);
         }
         .header-main-title {
-            font-size: 2.2rem; font-weight: 800; letter-spacing: 6px; 
+            font-size: 1.8rem; font-weight: 800; letter-spacing: 6px; 
             text-transform: uppercase;
             line-height: 1;
         }
         .header-sub-title {
-            font-size: 0.95rem; font-weight: 700; letter-spacing: 4px;
+            font-size: 0.85rem; font-weight: 700; letter-spacing: 4px;
             opacity: 0.7; text-transform: uppercase;
             margin-top: 4px;
         }
 
         @keyframes tierFadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; transform: translateY(15px) scale(0.9); }
+            to { opacity: 1; transform: translateY(0) scale(0.9); }
         }
 
         .card-container {
             width: 100%; display: flex; justify-content: center;
             perspective: 2500px;
+            transform: scale(0.85);
+            margin: -20px 0;
         }
 
         .trading-card {
             width: 360px; height: 500px; background: #000;
             border: 14px solid #fff; border-radius: 32px; position: relative;
-            box-shadow: 0 40px 80px rgba(0,0,0,0.9);
             transform-style: preserve-3d;
             overflow: hidden;
+            /* Persistent premium shadow */
+            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.25), 0 18px 36px -18px rgba(0, 0, 0, 0.3);
+            transition: box-shadow 0.3s ease;
         }
 
         .card-entrance {
-            animation: tcgReveal 2.2s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;
+            animation: 
+                tcgReveal 2.2s cubic-bezier(0.1, 0.9, 0.2, 1) forwards,
+                card-float 6s ease-in-out 2.2s infinite;
             transform-origin: center center;
+        }
+
+        @keyframes card-float {
+            0%, 100% { transform: translateY(0) rotateX(0) rotateY(0); }
+            25% { transform: translateY(-10px) rotateX(1deg) rotateY(1deg); }
+            50% { transform: translateY(-5px) rotateX(-1deg) rotateY(2deg); }
+            75% { transform: translateY(-12px) rotateX(1deg) rotateY(-1deg); }
         }
 
         @keyframes tcgReveal {
@@ -176,29 +268,29 @@
         @keyframes tcgFlash { 0% { transform: translateX(-100%) rotate(25deg); opacity: 0; } 10% { opacity: 1; } 30% { transform: translateX(100%) rotate(25deg); opacity: 0; } 100% { transform: translateX(100%) rotate(25deg); opacity: 0; } }
         .glare-spotlight { position: absolute; inset: 0; background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.4) 0%, transparent 60%); z-index: 4; mix-blend-mode: overlay; transition: opacity 0.5s ease; pointer-events: none; }
 
-        /* Diagonal Foil Shine Sweep: Post-Reveal Polish */
         .foil-sweep {
             position: absolute;
-            inset: -100%;
+            inset: -150%;
             background: linear-gradient(
                 110deg,
-                transparent 35%,
-                rgba(255, 255, 255, 0.1) 42%,
-                rgba(255, 255, 255, 0.6) 45%,
-                rgba(255, 255, 255, 0.1) 48%,
-                transparent 55%
+                transparent 40%,
+                rgba(120, 180, 255, 0.1) 42%,
+                rgba(255, 255, 255, 0.9) 45%,
+                rgba(255, 150, 255, 0.1) 48%,
+                transparent 50%
             );
             z-index: 6;
             pointer-events: none;
             opacity: 0;
             transform: translateX(-100%) rotate(25deg);
-            animation: foilShine 1.4s cubic-bezier(0.4, 0, 0.2, 1) 1.2s forwards;
+            animation: foilShine 2.5s cubic-bezier(0.4, 0, 0.2, 1) 1.4s forwards;
+            mix-blend-mode: color-dodge;
         }
 
         @keyframes foilShine {
             0% { transform: translateX(-100%) rotate(25deg); opacity: 0; }
-            20% { opacity: 0.8; }
-            80% { opacity: 0.8; }
+            20% { opacity: 1; }
+            80% { opacity: 1; }
             100% { transform: translateX(100%) rotate(25deg); opacity: 0; }
         }
 
@@ -206,50 +298,58 @@
             position: relative; z-index: 10; padding: 22px 22px 48px 22px; height: 100%;
             display: flex; flex-direction: column; color: #fff;
             text-shadow: 0 2px 10px rgba(0,0,0,1); transform-style: preserve-3d;
+            font-family: 'Inter', sans-serif;
         }
 
         .card-header-compact { 
             display: flex; align-items: center; gap: 16px; 
             margin-bottom: 20px; padding: 14px 16px; 
             background: rgba(255,255,255,0.05); backdrop-filter: blur(12px);
-            border-radius: 20px; border: 1px solid rgba(255,255,255,0.15); 
+            border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.15); 
         }
         .header-content { display: flex; flex-direction: column; justify-content: center; gap: 4px; }
         .profile-pic { width: 50px; height: 50px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 20px rgba(255,255,255,0.3); flex-shrink: 0; }
-        .username-label { font-weight: 800; font-size: 1.25rem; color: #fff; letter-spacing: -0.5px; line-height: 1; }
-        .stats-row { font-size: 0.7rem; font-weight: 800; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px; }
+        
+        .username-label { 
+            font-weight: 800; font-size: 1.25rem; color: #fff; letter-spacing: -0.5px; line-height: 1; 
+        }
+        
+        .stats-row { 
+            font-size: 0.7rem; font-weight: 800; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px; 
+        }
 
         .repos-section-expanded { flex-grow: 1; padding: 0 10px; margin-bottom: 4px; }
+        
         .section-title { 
             font-size: 0.7rem; font-weight: 800; color: rgba(255,255,255,0.5); 
             text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.15); margin-bottom: 16px; padding-bottom: 8px;
             letter-spacing: 2px;
         }
+        
         .repo-item { margin-bottom: 18px; }
+        
         .repo-name { font-weight: 800; font-size: 1rem; color: #fff; margin-bottom: 4px; }
+        
         .repo-desc { font-size: 0.75rem; color: rgba(255,255,255,0.6); line-height: 1.4; margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        
         .repo-stars { font-size: 0.75rem; font-weight: 800; opacity: 0.9; color: #fff; }
 
         .stack-footer-expanded { padding: 0 10px; margin-bottom: 18px; }
         .stack-list { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-start; }
+        
         .stack-tag { background: #fff; color: #000; padding: 4px 12px; border-radius: 6px; font-weight: 800; font-size: 0.65rem; text-transform: uppercase; box-shadow: 0 4px 10px rgba(255,255,255,0.1); white-space: nowrap; }
 
         .card-anchor-footer { 
             margin-top: auto; display: flex; align-items: flex-end; padding: 0 10px; opacity: 0.5;
             position: relative; height: 32px;
         }
+        
         .auth-stamp { font-size: 0.6rem; font-weight: 800; letter-spacing: 2px; line-height: 1; }
-        .rarity-icon { 
-            font-size: 1.8rem; 
-            position: absolute;
-            bottom: -10px; right: 0px; line-height: 1;
-        }
-
+        
+        .rarity-icon { font-size: 1.8rem; position: absolute; bottom: -10px; right: 0px; line-height: 1; }
+        
         .reset-btn { background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); cursor: pointer; }
-        .reset-btn:hover { background: #21262d; color: var(--text-primary); }
-
-        .loading-container { margin-top: 20px; }
-        .pulse-loader { width: 60px; height: 60px; background-color: #fff; border-radius: 50%; animation: pulse 1.5s ease-in-out infinite; margin: 0 auto 20px; box-shadow: 0 0 30px rgba(255, 255, 255, 0.3); }
+        .reset-btn:hover { background: #e2e8f0; color: var(--text-primary); }
 
     </style>
 </head>
@@ -408,15 +508,23 @@
                         data.tier = calculateRarityTier(data.followers, data.totalStars, data.publicRepos, data.totalForks);
                         setCardData(data);
                         setView('results');
-                    }, 800);
+                    }, 1200);
                     return;
                 }
 
                 try {
                     const response = await fetch(`${BACKEND_URL}/generate`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: targetUsername }) });
-                    if (!response.ok) throw new Error("Generation failed.");
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        console.error("Backend error:", errorText);
+                        throw new Error(`Generation failed: ${errorText}`);
+                    }
 
                     const cardResp = await fetch(`${BACKEND_URL}/card/${targetUsername}`);
+                    if (!cardResp.ok) {
+                        console.error("Card fetch failed:", cardResp.status);
+                        throw new Error("Card fetch failed");
+                    }
                     const cardHtml = await cardResp.text();
                     const doc = new DOMParser().parseFromString(cardHtml, 'text/html');
                     
@@ -428,18 +536,13 @@
                     };
 
                     const hiddenStats = doc.getElementById('hidden-stats');
-                    const followers = getCleanNum('stat-followers');
-                    const publicRepos = getCleanNum('stat-repos');
-                    const totalStars = parseInt(hiddenStats?.getAttribute('data-total-stars')) || 0;
-                    const totalForks = parseInt(hiddenStats?.getAttribute('data-total-forks')) || 0;
-
                     const realData = {
                         username: targetUsername,
                         avatar: doc.querySelector('img')?.src || `https://github.com/${targetUsername}.png`,
-                        followers,
-                        publicRepos,
-                        totalStars,
-                        totalForks,
+                        followers: getCleanNum('stat-followers'),
+                        publicRepos: getCleanNum('stat-repos'),
+                        totalStars: parseInt(hiddenStats?.getAttribute('data-total-stars')) || 0,
+                        totalForks: parseInt(hiddenStats?.getAttribute('data-total-forks')) || 0,
                         skills: Array.from(doc.querySelectorAll('.badge')).map(el => el.innerText),
                         repos: Array.from(doc.querySelectorAll('#repos-container > div')).map(el => ({
                             name: el.querySelector('strong')?.innerText || "Repo",
@@ -457,9 +560,6 @@
                 }
             };
 
-            const tierColors = { "Legendary": "#ffd700", "Epic": "#c084fc", "Rare": "#60a5fa", "Uncommon": "#4ade80", "Common": "#ffffff" };
-            const tierColor = cardData ? (tierColors[cardData.tier] || tierColors["Common"]) : tierColors["Common"];
-
             return (
                 <div className="app-container">
                     {view === 'input' && (
@@ -468,44 +568,49 @@
                                 <h1 style={{ fontSize: '3.2rem', marginBottom: '0', lineHeight: '1' }}>GitHub</h1>
                                 <h1 style={{ fontSize: '1.8rem', marginTop: '8px', opacity: 0.8, letterSpacing: '2px' }}>Developer Card Generator</h1>
                             </div>
-                            <div className="input-group">
-                                <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="GitHub Username" onKeyPress={(e) => e.key === 'Enter' && processGeneration()} />
-                                <button className="primary-btn" onClick={processGeneration}>Generate Card</button>
+                            <div className="landing-form-container">
+                                <div className="engraved-input-wrapper">
+                                    <input 
+                                        type="text" 
+                                        className="engraved-input"
+                                        value={username} 
+                                        onChange={(e) => setUsername(e.target.value)} 
+                                        placeholder="USERNAME" 
+                                        onKeyPress={(e) => e.key === 'Enter' && processGeneration()} 
+                                    />
+                                </div>
+                                <button className="sleek-primary-btn" onClick={processGeneration}>Generate Card</button>
                             </div>
                         </div>
                     )}
                     {view === 'loading' && (
-                        <div className="view">
-                            <div className="loading-container">
-                                <motion.div 
-                                    className="pulse-loader"
-                                    animate={{ 
-                                        scale: [1, 1.2, 1],
-                                        opacity: [0.6, 1, 0.6],
-                                        boxShadow: [
-                                            "0 0 20px rgba(255, 255, 255, 0.2)",
-                                            "0 0 60px rgba(255, 255, 255, 0.6)",
-                                            "0 0 20px rgba(255, 255, 255, 0.2)"
-                                        ]
-                                    }}
-                                    transition={{ 
-                                        duration: 1.2, 
-                                        repeat: Infinity, 
-                                        ease: "easeInOut" 
-                                    }}
-                                />
-                                <p className="subheading" style={{ fontSize: '2rem', letterSpacing: '4px' }}>...</p>
+                        <div className="view" style={{ height: '100vh', justifyContent: 'center' }}>
+                            <div className="loading-card">
+                                <div className="dot-spinner">
+                                    {[...Array(8)].map((_, i) => (
+                                        <div key={i} style={{ 
+                                            transform: `rotate(${i * 45}deg) translate(18px)`,
+                                            opacity: 1 - (i * 0.1)
+                                        }}></div>
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     )}
                     {view === 'results' && cardData && (
                         <div className="view results-view" style={{ minHeight: '100vh', justifyContent: 'center' }}>
-                            <div className="dynamic-tier-header" style={{ color: tierColor }}>
+                            <div className="dynamic-tier-header" style={{ color: cardData.tier === "Legendary" ? "#ffd700" : cardData.tier === "Epic" ? "#c084fc" : cardData.tier === "Rare" ? "#60a5fa" : cardData.tier === "Uncommon" ? "#4ade80" : "#1a202c" }}>
                                 <div className="header-main-title">CARD REVEALED</div>
                                 <div className="header-sub-title">{cardData.tier} Card</div>
                             </div>
                             <DevCard data={cardData} isHovering={isHovering} setIsHovering={setIsHovering} mousePos={mousePos} setMousePos={setMousePos} rotateX={rotateX} rotateY={rotateY} />
-                            <button className="primary-btn reset-btn" onClick={() => { setCardData(null); setView('input'); }}>Mint Another</button>
+                            <button 
+                                className="sleek-primary-btn" 
+                                style={{ animation: "tierFadeIn 1.4s cubic-bezier(0.2, 0.8, 0.2, 1) 1.5s forwards", opacity: 0 }}
+                                onClick={() => { setCardData(null); setView('input'); }}
+                            >
+                                Mint Another
+                            </button>
                         </div>
                     )}
                 </div>

@@ -9,20 +9,12 @@ An AI-powered developer profile analyzer and custom developer card generator. Bu
 
 ---
 
-## 🌐 Live Demo
-
-You can access the live application here:
-- **Frontend UI**: [https://github-card-frontend-1009339555607.us-central1.run.app](https://github-card-frontend-1009339555607.us-central1.run.app)
-- **Backend API**: [https://github-card-backend-1009339555607.us-central1.run.app](https://github-card-backend-1009339555607.us-central1.run.app)
-
----
-
 ## ✨ Features
 
 - **⚡ Instant Profile Scraping**: Leverages the GitHub REST API to securely fetch developer profiles and top-starred repositories.
-- **🧠 Gemini-Powered Analysis**: Utilizes **Gemini 1.5 Flash** (via `gemini-flash-latest`) to extract developer insights, define custom skills, and generate a personalized persona.
-- **🎨 Dynamic Persona Themes**: Automatically categorizes developers into visual themes like Hacker, Builder, Researcher, and more.
-- **🖥️ Premium Frontend UI**: immersive dark mode dashboard with skeleton loading animations and responsive previewing.
+- **🧠 Gemini-Powered Analysis**: Utilizes **Gemini 1.5 Flash** to extract developer insights, define custom skills, and generate a personalized persona.
+- **🎨 Dynamic Persona Themes**: Categorizes developers into visual themes (Hacker, Builder, Researcher, etc.) with custom-styled HTML cards.
+- **🖥️ Premium Frontend UI**: Single-page React application with cinematic entry animations and smooth card-float effects using **Framer Motion**.
 - **🐳 Cloud-Ready**: Fully containerized with Docker and optimized for deployment on **Google Cloud Run**.
 
 ---
@@ -71,3 +63,12 @@ graph TD
 ### ☁️ Deployment
 
 The project is pre-configured for Google Cloud Run. Use the provided Dockerfiles for automated builds and deployments.
+
+---
+
+## 🛠️ Tech Stack
+
+- **Backend**: Python, FastAPI, Google ADK (Agent Development Kit), FastMCP
+- **LLM**: Google Gemini 1.5 Flash
+- **Frontend**: React (CDN), Tailwind CSS (CDN), Framer Motion
+- **DevOps**: Docker, Docker Compose, Google Cloud Run
