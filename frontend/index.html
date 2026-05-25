@@ -15,6 +15,37 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <style>
+        @font-face {
+            font-family: 'Gill Sans Std Extra Bold';
+            src: url('fonts/GillSansStd-ExtraBold.otf') format('opentype');
+        }
+        @font-face {
+            font-family: 'Gill Sans Std';
+            src: url('fonts/GillSansStd.otf') format('opentype');
+        }
+        @font-face {
+            font-family: 'Futura Std Condensed Bold';
+            src: url('fonts/FuturaStd-CondensedBold.otf') format('opentype');
+        }
+        @font-face {
+            font-family: 'Futura Std Heavy';
+            src: url('fonts/FuturaStd-Heavy.otf') format('opentype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'Frutiger LT Std Light';
+            src: url('fonts/frutiger.otf') format('opentype');
+        }
+
+        @font-face {
+            font-family: 'Bauhaus';
+            src: url('/fonts/bauhaus.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
         :root {
             --bg-color: #eef2f6;
             --bg-gradient: radial-gradient(circle at center, #f8fafc 0%, #eef2f6 100%);
@@ -25,18 +56,21 @@
             --accent-hover: #000000;
             --border-color: #e2e8f0;
             
-            /* Metallic Tiers Base Colors */
-            --tier-legendary: #ffd700;
-            --tier-epic: #c084fc;
-            --tier-rare: #60a5fa;
-            --tier-uncommon: #4ade80;
-            --tier-common: #1a202c;
+            /* Mineral Tiers Base Colors */
+            --tier-legendary: #FFD700;   /* Gold */
+            --tier-epic: #9966CC;        /* Amethyst */
+            --tier-rare: #26619C;        /* Lapis Lazuli */
+            --tier-uncommon: #50C878;    /* Emerald */
+            --tier-common: #94A3B8;      /* Slate/Stone */
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
-        body {
+        body, input, button, select, textarea {
             font-family: 'Roboto', sans-serif;
+        }
+
+        body {
             background: var(--bg-gradient);
             color: var(--text-primary);
             min-height: 100vh;
@@ -72,6 +106,28 @@
             box-sizing: border-box;
             width: 100%;
             height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Decorative Hero Circle behind the card */
+        .bg-glow-circle {
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 800px; height: 800px;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--glow-color, rgba(255,255,255,0.05)) 0%, transparent 60%);
+            filter: blur(80px);
+            z-index: 0;
+            opacity: 0.15; /* Significantly reduced to stop global tinting */
+            transform: translate(-50%, -50%);
+            animation: glowPulse 10s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes glowPulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.1; }
+            50% { transform: translate(-50%, -50%) scale(1.05); opacity: 0.2; }
         }
 
         @keyframes fadeIn {
@@ -80,6 +136,7 @@
         }
 
         h1 {
+            font-family: 'Inter', sans-serif;
             font-size: 2.2rem; font-weight: 800; margin-bottom: 8px; letter-spacing: -1px;
             background: linear-gradient(180deg, #1a202c 0%, #4a5568 100%);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
@@ -111,18 +168,18 @@
             width: 100%;
             background: transparent;
             border: none;
-            color: #1a202c;
+            color: #768393;
             padding: 18px 32px; /* Adjusted padding for pill-shape */
             font-size: 1.1rem;
             outline: none;
-            font-weight: 600;
+            font-weight: 400;
             text-align: center;
         }
         .engraved-input::placeholder {
             color: #94a3b8;
             font-weight: 800;
             letter-spacing: 3px;
-            opacity: 0.5;
+            opacity: 0.3;
             text-transform: uppercase;
         }
 
@@ -140,10 +197,10 @@
             width: fit-content;
             align-self: center;
             box-shadow: 0 4px 12px rgba(70, 240, 255, 0.2);
+            transform: scale(0.9);
         }
         .sleek-primary-btn:hover {
             background-color: #2edfff;
-            transform: translateY(-2px);
             box-shadow: 0 8px 24px rgba(70, 240, 255, 0.4);
         }
 
@@ -203,14 +260,17 @@
             animation: tierFadeIn 1.4s cubic-bezier(0.2, 0.8, 0.2, 1) 1.5s forwards;
             opacity: 0;
             transform: scale(0.9);
+            font-family: 'Inter', sans-serif;
         }
         .header-main-title {
-            font-size: 1.8rem; font-weight: 800; letter-spacing: 6px; 
+            font-family: 'Bauhaus', sans-serif !important;
+            font-size: 1.8rem; font-weight: normal !important; letter-spacing: 6px; 
             text-transform: uppercase;
             line-height: 1;
         }
         .header-sub-title {
-            font-size: 0.85rem; font-weight: 700; letter-spacing: 4px;
+            font-family: 'Bauhaus', sans-serif !important;
+            font-size: 0.85rem; font-weight: normal !important; letter-spacing: 4px;
             opacity: 0.7; text-transform: uppercase;
             margin-top: 4px;
         }
@@ -228,13 +288,24 @@
         }
 
         .trading-card {
-            width: 360px; height: 500px; background: #000;
-            border: 14px solid #fff; border-radius: 32px; position: relative;
+            width: 360px; height: 500px;
+            position: relative;
+            border-radius: 32px;
             transform-style: preserve-3d;
-            overflow: hidden;
-            /* Persistent premium shadow */
-            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.25), 0 18px 36px -18px rgba(0, 0, 0, 0.3);
-            transition: box-shadow 0.3s ease;
+            
+            /* Raised Metallic Frame (Asymmetric Effect) */
+            border: 14px solid transparent;
+            background: 
+                linear-gradient(#000, #000) padding-box, 
+                linear-gradient(135deg, #ffffff 0%, #a1a1aa 40%, #ffffff 50%, #71717a 60%, #ffffff 100%) border-box;
+            
+            /* Tight Edge-Line Shadow Only */
+            box-shadow: 
+                0 0 0 1px rgba(0, 0, 0, 0.8),
+                0 0 12px rgba(0, 0, 0, 0.4);
+            
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: visible;
         }
 
         .card-entrance {
@@ -260,30 +331,50 @@
         .card-layers {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             pointer-events: none; z-index: 1;
-            border-radius: 20px; overflow: hidden;
+            overflow: hidden;
+            border-radius: 18px; /* Internal rounding to match outer curve */
         }
-        .layer-base { position: absolute; inset: 0; transition: background 0.5s ease; box-shadow: inset 0 0 120px rgba(255,255,255,0.08); }
-        .layer-pattern { position: absolute; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px); background-size: 32px 32px; opacity: 0.8; }
-        .glare-flash { position: absolute; inset: -100%; background: linear-gradient(110deg, transparent 40%, rgba(255,255,255,0.8) 50%, transparent 60%); z-index: 5; animation: tcgFlash 2.2s cubic-bezier(0.1, 0.9, 0.2, 1) forwards; pointer-events: none; }
+        .layer-base { position: absolute; inset: 0; transition: background 0.5s ease; box-shadow: inset 0 0 120px rgba(255,255,255,0.1); }
+        
+        /* Matte Metallic Texture Overlay */
+        .layer-matte {
+            position: absolute; inset: 0;
+            background-image: url("https://www.transparenttextures.com/patterns/brushed-alum.png");
+            opacity: 0.2;
+            mix-blend-mode: overlay;
+            pointer-events: none;
+        }
+
+        .layer-pattern { 
+            position: absolute; inset: 0; 
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px), 
+                linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px); 
+            background-size: 24px 24px; 
+            background-position: center center;
+            opacity: 1; 
+            z-index: 2;
+        }
+        .glare-flash { position: absolute; inset: -100%; background: linear-gradient(110deg, transparent 40%, rgba(255,255,255,0.3) 50%, transparent 60%); z-index: 5; animation: tcgFlash 2.5s cubic-bezier(0.1, 0.9, 0.2, 1) forwards; pointer-events: none; }
         @keyframes tcgFlash { 0% { transform: translateX(-100%) rotate(25deg); opacity: 0; } 10% { opacity: 1; } 30% { transform: translateX(100%) rotate(25deg); opacity: 0; } 100% { transform: translateX(100%) rotate(25deg); opacity: 0; } }
-        .glare-spotlight { position: absolute; inset: 0; background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.4) 0%, transparent 60%); z-index: 4; mix-blend-mode: overlay; transition: opacity 0.5s ease; pointer-events: none; }
+        .glare-spotlight { position: absolute; inset: 0; background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.2) 0%, transparent 60%); z-index: 4; mix-blend-mode: overlay; transition: opacity 0.5s ease; pointer-events: none; }
 
         .foil-sweep {
             position: absolute;
             inset: -150%;
             background: linear-gradient(
                 110deg,
-                transparent 40%,
-                rgba(120, 180, 255, 0.1) 42%,
-                rgba(255, 255, 255, 0.9) 45%,
-                rgba(255, 150, 255, 0.1) 48%,
-                transparent 50%
+                transparent 30%,
+                rgba(255, 255, 255, 0) 35%,
+                rgba(255, 255, 255, 0.6) 45%,
+                rgba(255, 255, 255, 0) 55%,
+                transparent 70%
             );
             z-index: 6;
             pointer-events: none;
             opacity: 0;
             transform: translateX(-100%) rotate(25deg);
-            animation: foilShine 2.5s cubic-bezier(0.4, 0, 0.2, 1) 1.4s forwards;
+            animation: foilShine 3s cubic-bezier(0.4, 0, 0.2, 1) 1.5s forwards;
             mix-blend-mode: color-dodge;
         }
 
@@ -295,58 +386,258 @@
         }
 
         .card-content {
-            position: relative; z-index: 10; padding: 22px 22px 48px 22px; height: 100%;
-            display: flex; flex-direction: column; color: #fff;
-            text-shadow: 0 2px 10px rgba(0,0,0,1); transform-style: preserve-3d;
-            font-family: 'Inter', sans-serif;
+            position: relative; z-index: 10; padding: 22px 22px 0 22px; height: 100%;
+            display: flex; flex-direction: column; color: #1a1a1a;
+            transform-style: preserve-3d;
+            font-family: 'Gill Sans Std', sans-serif;
+        }
+
+        .visual-window {
+            position: absolute;
+            top: 20px; left: 20px; right: 20px; bottom: 65px;
+            background: #ffffff; /* Clean white background */
+            backdrop-filter: blur(2px);
+            border-radius: 20px 20px 0 0; 
+            border: 1px solid rgba(0, 0, 0, 0.05); 
+            box-shadow: inset 0 2px 12px rgba(0,0,0,0.03);
+            pointer-events: none;
+            z-index: -1;
         }
 
         .card-header-compact { 
-            display: flex; align-items: center; gap: 16px; 
-            margin-bottom: 20px; padding: 14px 16px; 
-            background: rgba(255,255,255,0.05); backdrop-filter: blur(12px);
-            border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.15); 
+            display: flex; align-items: center; gap: 12px; 
+            margin-bottom: 4px; padding: 12px 14px; 
+            background: transparent;
         }
-        .header-content { display: flex; flex-direction: column; justify-content: center; gap: 4px; }
-        .profile-pic { width: 50px; height: 50px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 20px rgba(255,255,255,0.3); flex-shrink: 0; }
+        .header-content { display: flex; flex-direction: column; justify-content: center; gap: 2px; flex-grow: 1; overflow: hidden; }
+        .profile-pic { 
+            width: 46px; height: 46px; border-radius: 50%; 
+            background: 
+                linear-gradient(#000, #000) padding-box, 
+                linear-gradient(180deg, #cbd5e1 0%, #ffffff 30%, #1e293b 100%) border-box;
+            border: 4px solid transparent; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2); flex-shrink: 0; 
+        }
         
         .username-label { 
-            font-weight: 800; font-size: 1.25rem; color: #fff; letter-spacing: -0.5px; line-height: 1; 
+            font-family: 'Futura Std Heavy', sans-serif;
+            font-weight: 800; color: #000; letter-spacing: -0.2px; line-height: 1.1; 
+            -webkit-text-stroke: 1px rgba(255,255,255,0.9);
+            paint-order: stroke fill;
+            text-align: left;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         
         .stats-row { 
-            font-size: 0.7rem; font-weight: 800; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px; 
+            font-family: 'Futura Std Heavy', sans-serif;
+            font-size: 0.75rem; font-weight: 800; opacity: 1; text-transform: uppercase; letter-spacing: 0.2px; display: flex; align-items: center; gap: 8px; 
+            color: #000; -webkit-text-stroke: 1px rgba(255,255,255,0.8); paint-order: stroke fill;
         }
 
-        .repos-section-expanded { flex-grow: 1; padding: 0 10px; margin-bottom: 4px; }
+        .stat-label {
+            font-size: 0.5rem;
+            margin-left: 2px;
+        }
+
+        .repos-section-expanded { padding: 0 10px; margin-bottom: 16px; }
         
         .section-title { 
-            font-size: 0.7rem; font-weight: 800; color: rgba(255,255,255,0.5); 
-            text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.15); margin-bottom: 16px; padding-bottom: 8px;
-            letter-spacing: 2px;
+            font-family: 'Frutiger LT Std Light', sans-serif;
+            font-size: 0.8rem; font-weight: 800; color: #000; 
+            margin: 0; padding: 0;
+            letter-spacing: 0.5px;
+            font-style: italic;
+            -webkit-text-stroke: 0.5px rgba(255,255,255,0.6);
+            paint-order: stroke fill;
+            position: relative; z-index: 2;
+            transform: skewX(15deg); /* Counter-skew for text */
+            display: inline-block;
+        }
+
+        .section-header-bar {
+            position: relative;
+            width: calc(100% + 28px); /* Slightly wider to create a capped look */
+            margin-left: -14px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            padding-left: 24px;
+            margin-bottom: 12px;
+            border-radius: 4px; /* Subtle rounded edges */
+            transform: skewX(-15deg); /* Diagonal sides */
+            
+            /* Metallic Bar Background - Moderately Light -> Light -> Dark */
+            background: 
+                linear-gradient(rgba(255,255,255,0.1), rgba(255,255,255,0.1)) padding-box, 
+                linear-gradient(180deg, #cbd5e1 0%, #ffffff 30%, #1e293b 100%) border-box;
+            border-top: 1.5px solid transparent;
+            border-bottom: 1.5px solid transparent;
+            
+            /* Pronounced depth shadow */
+            box-shadow: 
+                0 4px 8px rgba(0,0,0,0.3),
+                0 8px 16px rgba(0,0,0,0.2);
+        }
+
+        .window-bottom-edge {
+            position: absolute;
+            bottom: 65px;
+            left: 20px; /* Reverted to original length */
+            right: 20px;
+            height: 4px;
+            border-radius: 1px; /* Sharper corners to make the diagonal slant explicit */
+            transform: skewX(-15deg); /* Slanted sides to match headers */
+            
+            /* Same Metallic Style as section-header-bar */
+            background: 
+                linear-gradient(rgba(255,255,255,0.1), rgba(255,255,255,0.1)) padding-box, 
+                linear-gradient(180deg, #cbd5e1 0%, #ffffff 30%, #1e293b 100%) border-box;
+            border-top: 1.5px solid transparent;
+            border-bottom: 1.5px solid transparent;
+            
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            z-index: 5;
         }
         
-        .repo-item { margin-bottom: 18px; }
+        .repo-item { margin-bottom: 18px; display: flex; flex-direction: column; }
+        .repo-item:last-child { margin-bottom: 0; }
         
-        .repo-name { font-weight: 800; font-size: 1rem; color: #fff; margin-bottom: 4px; }
+        .repo-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
         
-        .repo-desc { font-size: 0.75rem; color: rgba(255,255,255,0.6); line-height: 1.4; margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .repo-name { 
+            font-family: 'Futura Std Heavy', sans-serif;
+            font-weight: 800; font-size: 1rem; color: #000; 
+            -webkit-text-stroke: 1px rgba(255,255,255,0.8);
+            paint-order: stroke fill;
+            text-align: left;
+            letter-spacing: 0.2px;
+        }
         
-        .repo-stars { font-size: 0.75rem; font-weight: 800; opacity: 0.9; color: #fff; }
+        .repo-desc { 
+            font-size: 0.75rem; color: #000; line-height: 1.4; 
+            display: -webkit-box; -webkit-line-clamp: 2; 
+            -webkit-box-orient: vertical; overflow: hidden;
+            -webkit-text-stroke: 1px rgba(255,255,255,0.8);
+            paint-order: stroke fill;
+            text-align: left;
+        }
+        
+        .repo-stars { 
+            font-family: 'Futura Std Heavy', sans-serif;
+            font-size: 1rem; font-weight: 800; color: #000;
+            -webkit-text-stroke: 1px rgba(255,255,255,0.8);
+            paint-order: stroke fill;
+            white-space: nowrap;
+            display: flex; align-items: center; gap: 8px;
+        }
 
-        .stack-footer-expanded { padding: 0 10px; margin-bottom: 18px; }
-        .stack-list { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-start; }
+        .star-circle {
+            background: #fff;
+            width: 22px; height: 22px;
+            border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .star-inner-ring {
+            width: 18px; height: 18px;
+            border-radius: 50%;
+            border: 0.3px solid rgba(0,0,0,0.8); /* Ultra-fine, delicate outline */
+            display: flex; justify-content: center; align-items: center;
+            box-sizing: border-box;
+        }
+
+        .star-filled {
+            color: #000;
+            font-size: 0.75rem;
+            line-height: 1;
+            font-style: normal;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0; padding: 0;
+        }
+
+        .stack-footer-expanded { padding: 0 10px; margin-bottom: 40px; }
+        .stack-list { 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 12px; 
+            justify-content: flex-start; 
+            padding: 8px 8px;
+        }
         
-        .stack-tag { background: #fff; color: #000; padding: 4px 12px; border-radius: 6px; font-weight: 800; font-size: 0.65rem; text-transform: uppercase; box-shadow: 0 4px 10px rgba(255,255,255,0.1); white-space: nowrap; }
+        .stack-tag { 
+            /* Metallic Gradient Border Trick */
+            background: 
+                linear-gradient(#000, #000) padding-box, 
+                linear-gradient(135deg, #71717a 0%, #ffffff 45%, #a1a1aa 55%, #3f3f46 100%) border-box;
+            border: 3px solid transparent;
+            
+            color: #fff; 
+            padding: 3px 24px; border-radius: 24px; 
+            font-weight: 900; font-size: 0.65rem; text-transform: uppercase; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3); white-space: nowrap; 
+            transform: skewX(-15deg);
+            display: flex; align-items: center;
+        }
+
+        .tag-text {
+            transform: skewX(15deg); /* Counter-skew */
+            font-style: italic;
+            display: flex; align-items: center;
+        }
 
         .card-anchor-footer { 
-            margin-top: auto; display: flex; align-items: flex-end; padding: 0 10px; opacity: 0.5;
-            position: relative; height: 32px;
+            position: absolute; bottom: 12px; left: 32px; right: 32px;
+            display: flex; align-items: center; justify-content: space-between; padding: 0; opacity: 1;
+            height: 40px; color: #000; z-index: 15;
+        }
+
+        .tier-metallic-badge {
+            /* Silver Metallic Background from section bars */
+            background: 
+                linear-gradient(rgba(255,255,255,0.1), rgba(255,255,255,0.1)) padding-box, 
+                linear-gradient(180deg, #cbd5e1 0%, #ffffff 30%, #1e293b 100%) border-box;
+            border: 1.5px solid transparent;
+            border-radius: 4px;
+            
+            color: #000;
+            padding: 2px 12px;
+            font-family: 'Futura Std Heavy', sans-serif;
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-style: italic;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            -webkit-text-stroke: 0.3px rgba(255,255,255,0.4);
+            paint-order: stroke fill;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: skewX(-15deg); /* Slanted sides */
         }
         
-        .auth-stamp { font-size: 0.6rem; font-weight: 800; letter-spacing: 2px; line-height: 1; }
+        .tier-text {
+            transform: skewX(15deg); /* Counter-skew */
+            display: inline-block;
+        }
         
-        .rarity-icon { font-size: 1.8rem; position: absolute; bottom: -10px; right: 0px; line-height: 1; }
+        .auth-stamp { 
+            font-family: 'Frutiger LT Std Light', sans-serif;
+            font-size: 0.55rem; font-weight: normal !important; letter-spacing: 1px; line-height: 1; text-transform: uppercase; 
+            color: #000;
+            font-style: italic;
+            text-align: right;
+            padding-right: 0;
+            -webkit-text-stroke: 0.4px rgba(255,255,255,0.7);
+            paint-order: stroke fill;
+        }
         
         .reset-btn { background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); cursor: pointer; }
         .reset-btn:hover { background: #e2e8f0; color: var(--text-primary); }
@@ -401,6 +692,15 @@
                 return () => clearTimeout(timer);
             }, []);
 
+            const getFontSize = (text) => {
+                const len = text.length;
+                if (len <= 10) return "1.85rem";
+                if (len <= 14) return "1.6rem";
+                if (len <= 18) return "1.4rem";
+                if (len <= 25) return "1.2rem";
+                return "1.0rem";
+            };
+
             const handleMouseMove = (e) => {
                 if (isEntering) return;
                 const rect = e.currentTarget.getBoundingClientRect();
@@ -412,11 +712,11 @@
             };
 
             const tierStyles = {
-                "Legendary": { accent: "#ffd700", bg: "linear-gradient(135deg, #b8860b 0%, #453500 100%)" },
-                "Epic": { accent: "#c084fc", bg: "linear-gradient(135deg, #581c87 0%, #2e1065 100%)" },
-                "Rare": { accent: "#60a5fa", bg: "linear-gradient(135deg, #1e3a8a 0%, #172554 100%)" },
-                "Uncommon": { accent: "#4ade80", bg: "linear-gradient(135deg, #065f46 0%, #022c22 100%)" },
-                "Common": { accent: "#ffffff", bg: "linear-gradient(135deg, #334155 0%, #0f172a 100%)" }
+                "Legendary": { accent: "#FFD700", windowBg: "rgba(255, 215, 0, 0.15)", bg: "linear-gradient(135deg, #FFD700 0%, #FDB931 25%, #FFD700 50%, #B8860B 75%, #FFD700 100%)" },
+                "Epic": { accent: "#9966CC", windowBg: "rgba(153, 102, 204, 0.15)", bg: "linear-gradient(135deg, #9966CC 0%, #B666D2 25%, #9966CC 50%, #4B0082 75%, #9966CC 100%)" },
+                "Rare": { accent: "#26619C", windowBg: "rgba(38, 97, 156, 0.15)", bg: "linear-gradient(135deg, #26619C 0%, #3B7FB9 25%, #26619C 50%, #002366 75%, #26619C 100%)" },
+                "Uncommon": { accent: "#50C878", windowBg: "rgba(80, 200, 120, 0.15)", bg: "linear-gradient(135deg, #50C878 0%, #6EE194 25%, #50C878 50%, #064E3B 75%, #50C878 100%)" },
+                "Common": { accent: "#94A3B8", windowBg: "rgba(148, 163, 184, 0.15)", bg: "linear-gradient(135deg, #94A3B8 0%, #CBD5E1 25%, #94A3B8 50%, #1E293B 75%, #94A3B8 100%)" }
             };
             const currentStyle = tierStyles[data.tier] || tierStyles["Common"];
 
@@ -431,44 +731,77 @@
                     >
                         <div className="card-layers">
                             <div className="layer-base" style={{ background: currentStyle.bg }}></div>
+                            <div className="layer-matte"></div>
                             <div className="layer-pattern"></div>
                             <div className="glare-flash"></div>
                             <div className="foil-sweep"></div>
                             <div className="glare-spotlight" style={{ opacity: isHovering ? 1 : 0 }}></div>
                         </div>
                         <div className="card-content">
+                            <div className="visual-window" style={{ transform: "translateZ(10px)", background: currentStyle.windowBg }}></div>
+                            <div className="window-bottom-edge" style={{ transform: "translateZ(15px) skewX(-15deg)" }}></div>
+                            
                             <div className="card-header-compact" style={{ transform: "translateZ(40px)" }}>
                                 <img src={data.avatar} className="profile-pic" alt="Avatar" />
                                 <div className="header-content">
-                                    <div className="username-label">{data.username}</div>
+                                    <div className="username-label" style={{ fontSize: getFontSize(data.username) }}>{data.username}</div>
                                     <div className="stats-row">
-                                        <span>{formatNum(data.followers)} FLW</span>
+                                        <span>{formatNum(data.followers)}<span className="stat-label">FLW</span></span>
                                         <span style={{ opacity: 0.4 }}>•</span>
-                                        <span>{formatNum(data.totalStars)} STR</span>
+                                        <span>{formatNum(data.totalStars)}<span className="stat-label">STR</span></span>
                                     </div>
                                 </div>
                             </div>
+
                             <div className="repos-section-expanded" style={{ transform: "translateZ(30px)" }}>
-                                <div className="section-title">Latest Repositories</div>
+                                <div className="section-header-bar">
+                                    <div className="section-title">Latest Repositories</div>
+                                </div>
                                 {data.repos.slice(0, 2).map((r, i) => (
                                     <div className="repo-item" key={i}>
-                                        <div className="repo-name">{r.name}</div>
+                                        <div className="repo-header">
+                                            <div className="repo-name">{r.name}</div>
+                                            <div className="repo-stars">
+                                                {r.stars}
+                                                <div className="star-circle">
+                                                    <div className="star-inner-ring">
+                                                        <span className="star-filled">★</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                         <div className="repo-desc">{r.desc}</div>
-                                        <div className="repo-stars">⭐ {r.stars} STARS</div>
                                     </div>
                                 ))}
                             </div>
+
                             <div className="stack-footer-expanded" style={{ transform: "translateZ(25px)" }}>
-                                <div className="section-title">Top Stack</div>
+                                <div className="section-header-bar">
+                                    <div className="section-title">Top Stack</div>
+                                </div>
                                 <div className="stack-list">
-                                    {data.skills.slice(0, 3).map((s, i) => (
-                                        <span className="stack-tag" key={i}>{s}</span>
-                                    ))}
+                                    {(() => {
+                                        const top3 = data.skills.slice(0, 3);
+                                        const totalChars = top3.reduce((acc, s) => acc + s.length, 0);
+                                        // If total chars likely cause wrap (> 22 chars), fallback to top 2
+                                        const visibleSkills = (totalChars > 22 && top3.length === 3) ? top3.slice(0, 2) : top3;
+                                        return visibleSkills.map((s, i) => (
+                                            <span className="stack-tag" key={i}>
+                                                <div className="tag-text">
+                                                    <div className="tag-dot"></div>
+                                                    {s}
+                                                </div>
+                                            </span>
+                                        ));
+                                    })()}
                                 </div>
                             </div>
+
                             <div className="card-anchor-footer" style={{ transform: "translateZ(20px)" }}>
+                                <div className="tier-metallic-badge">
+                                    <span className="tier-text">{data.tier}</span>
+                                </div>
                                 <div className="auth-stamp">{data.publicRepos} REPOS / {data.totalForks} FORKS</div>
-                                <div className="rarity-icon" style={{ color: currentStyle.accent }}>✧</div>
                             </div>
                         </div>
                     </motion.div>
@@ -564,9 +897,9 @@
                 <div className="app-container">
                     {view === 'input' && (
                         <div className="view">
-                            <div style={{ marginBottom: '24px' }}>
-                                <h1 style={{ fontSize: '3.2rem', marginBottom: '0', lineHeight: '1' }}>GitHub</h1>
-                                <h1 style={{ fontSize: '1.8rem', marginTop: '8px', opacity: 0.8, letterSpacing: '2px' }}>Developer Card Generator</h1>
+                            <div style={{ marginBottom: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', fontFamily: "'Inter', sans-serif" }}>
+                                <div className="header-main-title" style={{ fontSize: '2.8rem', letterSpacing: '12px' }}>GITHUB</div>
+                                <div className="header-sub-title" style={{ fontSize: '1.1rem', letterSpacing: '6px', marginTop: '4px', opacity: 0.6 }}>DEVELOPER CARD GENERATOR</div>
                             </div>
                             <div className="landing-form-container">
                                 <div className="engraved-input-wrapper">
@@ -579,7 +912,7 @@
                                         onKeyPress={(e) => e.key === 'Enter' && processGeneration()} 
                                     />
                                 </div>
-                                <button className="sleek-primary-btn" onClick={processGeneration}>Generate Card</button>
+                                <button className="sleek-primary-btn" onClick={processGeneration}>GENERATE</button>
                             </div>
                         </div>
                     )}
@@ -597,22 +930,33 @@
                             </div>
                         </div>
                     )}
-                    {view === 'results' && cardData && (
-                        <div className="view results-view" style={{ minHeight: '100vh', justifyContent: 'center' }}>
-                            <div className="dynamic-tier-header" style={{ color: cardData.tier === "Legendary" ? "#ffd700" : cardData.tier === "Epic" ? "#c084fc" : cardData.tier === "Rare" ? "#60a5fa" : cardData.tier === "Uncommon" ? "#4ade80" : "#1a202c" }}>
-                                <div className="header-main-title">CARD REVEALED</div>
-                                <div className="header-sub-title">{cardData.tier} Card</div>
+                    {view === 'results' && cardData && (() => {
+                        const tierColorMap = {
+                            "Legendary": "#FFD700",
+                            "Epic": "#9966CC",
+                            "Rare": "#26619C",
+                            "Uncommon": "#50C878",
+                            "Common": "#94A3B8"
+                        };
+                        const activeColor = tierColorMap[cardData.tier] || tierColorMap["Common"];
+                        
+                        return (
+                            <div className="view results-view">
+                                <div className="dynamic-tier-header" style={{ color: activeColor }}>
+                                    <div className="header-main-title">CARD REVEALED</div>
+                                    <div className="header-sub-title">{cardData.tier} Card</div>
+                                </div>
+                                <DevCard data={cardData} isHovering={isHovering} setIsHovering={setIsHovering} mousePos={mousePos} setMousePos={setMousePos} rotateX={rotateX} rotateY={rotateY} />
+                                <button 
+                                    className="sleek-primary-btn" 
+                                    style={{ animation: "tierFadeIn 1.4s cubic-bezier(0.2, 0.8, 0.2, 1) 1.5s forwards", opacity: 0 }}
+                                    onClick={() => { setCardData(null); setView('input'); }}
+                                >
+                                    GENERATE
+                                </button>
                             </div>
-                            <DevCard data={cardData} isHovering={isHovering} setIsHovering={setIsHovering} mousePos={mousePos} setMousePos={setMousePos} rotateX={rotateX} rotateY={rotateY} />
-                            <button 
-                                className="sleek-primary-btn" 
-                                style={{ animation: "tierFadeIn 1.4s cubic-bezier(0.2, 0.8, 0.2, 1) 1.5s forwards", opacity: 0 }}
-                                onClick={() => { setCardData(null); setView('input'); }}
-                            >
-                                Mint Another
-                            </button>
-                        </div>
-                    )}
+                        );
+                    })()}
                 </div>
             );
         };

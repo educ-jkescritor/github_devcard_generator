@@ -3,6 +3,10 @@ FROM nginx:alpine
 # Copy index.html to a template location
 COPY index.html /usr/share/nginx/html/index.html.template
 
+# Copy static assets
+COPY static /usr/share/nginx/html/static
+COPY fonts /usr/share/nginx/html/fonts
+
 # Default backend URL
 ENV BACKEND_URL=http://localhost:8080
 
