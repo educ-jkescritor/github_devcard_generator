@@ -46,6 +46,21 @@
             font-style: normal;
         }
 
+        @font-face {
+            font-family: 'Sanvito Pro Regular';
+            src: url('fonts/SanvitoPro-Regular.otf') format('opentype');
+        }
+
+        @font-face {
+            font-family: 'Frutiger Extra Black';
+            src: url('fonts/FrutigerLTStd-ExtraBlackCn.otf') format('opentype');
+        }
+
+        @font-face {
+            font-family: 'Humanist 521 Bold Italic';
+            src: url('fonts/HUM521BI.TTF') format('truetype');
+        }
+
         :root {
             --bg-color: #eef2f6;
             --bg-gradient: radial-gradient(circle at center, #f8fafc 0%, #eef2f6 100%);
@@ -299,10 +314,10 @@
                 linear-gradient(#000, #000) padding-box, 
                 linear-gradient(135deg, #ffffff 0%, #a1a1aa 40%, #ffffff 50%, #71717a 60%, #ffffff 100%) border-box;
             
-            /* Tight Edge-Line Shadow Only */
+            /* Ultra-Sharp Bottom-Right Directional Shadow */
             box-shadow: 
-                0 0 0 1px rgba(0, 0, 0, 0.8),
-                0 0 12px rgba(0, 0, 0, 0.4);
+                0 0 0 1px rgba(0, 0, 0, 0.9),
+                2px 2px 4px rgba(0, 0, 0, 0.6);
             
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             overflow: visible;
@@ -416,7 +431,7 @@
                 linear-gradient(#000, #000) padding-box, 
                 linear-gradient(180deg, #cbd5e1 0%, #ffffff 30%, #1e293b 100%) border-box;
             border: 4px solid transparent; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2); flex-shrink: 0; 
+            box-shadow: 1.5px 1.5px 3px rgba(0,0,0,0.5); flex-shrink: 0; 
         }
         
         .username-label { 
@@ -444,13 +459,11 @@
         .repos-section-expanded { padding: 0 10px; margin-bottom: 16px; }
         
         .section-title { 
-            font-family: 'Frutiger LT Std Light', sans-serif;
-            font-size: 0.8rem; font-weight: 800; color: #000; 
+            font-family: 'Humanist 521 Bold Italic', sans-serif;
+            font-size: 0.8rem; font-weight: normal; color: #000; 
             margin: 0; padding: 0;
             letter-spacing: 0.5px;
-            font-style: italic;
-            -webkit-text-stroke: 0.5px rgba(255,255,255,0.6);
-            paint-order: stroke fill;
+            font-style: normal; /* Font file is already italic */
             position: relative; z-index: 2;
             transform: skewX(15deg); /* Counter-skew for text */
             display: inline-block;
@@ -475,10 +488,8 @@
             border-top: 1.5px solid transparent;
             border-bottom: 1.5px solid transparent;
             
-            /* Pronounced depth shadow */
-            box-shadow: 
-                0 4px 8px rgba(0,0,0,0.3),
-                0 8px 16px rgba(0,0,0,0.2);
+            /* Ultra-Sharp Bottom-Right Directional Shadow */
+            box-shadow: 2px 2px 4px rgba(0,0,0,0.5);
         }
 
         .window-bottom-edge {
@@ -497,7 +508,8 @@
             border-top: 1.5px solid transparent;
             border-bottom: 1.5px solid transparent;
             
-            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            /* Ultra-Sharp Bottom-Right Directional Shadow */
+            box-shadow: 1.5px 1.5px 3px rgba(0,0,0,0.5);
             z-index: 5;
         }
         
@@ -535,20 +547,13 @@
 
         .star-circle {
             background: #fff;
-            width: 22px; height: 22px;
+            width: 20px; height: 20px;
             border-radius: 50%;
             display: flex; justify-content: center; align-items: center;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            /* Deep Concave 3D Effect: Increased opacity and sharper inset */
+            box-shadow: inset -2px -2px 4px rgba(0,0,0,0.45);
             flex-shrink: 0;
             position: relative;
-        }
-
-        .star-inner-ring {
-            width: 18px; height: 18px;
-            border-radius: 50%;
-            border: 0.3px solid rgba(0,0,0,0.8); /* Ultra-fine, delicate outline */
-            display: flex; justify-content: center; align-items: center;
-            box-sizing: border-box;
         }
 
         .star-filled {
@@ -560,6 +565,8 @@
             justify-content: center;
             align-items: center;
             margin: 0; padding: 0;
+            -webkit-text-stroke: 0px transparent;
+            paint-order: stroke fill;
         }
 
         .stack-footer-expanded { padding: 0 10px; margin-bottom: 40px; }
@@ -580,8 +587,9 @@
             
             color: #fff; 
             padding: 3px 24px; border-radius: 24px; 
-            font-weight: 900; font-size: 0.65rem; text-transform: uppercase; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3); white-space: nowrap; 
+            font-family: 'Humanist 521 Bold Italic', sans-serif;
+            font-weight: normal; font-size: 0.65rem; text-transform: uppercase; 
+            box-shadow: 1.5px 1.5px 3px rgba(0,0,0,0.5); white-space: nowrap; 
             transform: skewX(-15deg);
             display: flex; align-items: center;
         }
@@ -593,9 +601,10 @@
         }
 
         .card-anchor-footer { 
-            position: absolute; bottom: 12px; left: 32px; right: 32px;
+            position: absolute; bottom: 13px; left: 32px; right: 32px;
             display: flex; align-items: center; justify-content: space-between; padding: 0; opacity: 1;
-            height: 40px; color: #000; z-index: 15;
+            color: #000; z-index: 15;
+            height: 40px; /* Provides consistent height for vertical centering calculations */
         }
 
         .tier-metallic-badge {
@@ -614,7 +623,7 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             font-style: italic;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            box-shadow: 1.5px 1.5px 3px rgba(0,0,0,0.5);
             -webkit-text-stroke: 0.3px rgba(255,255,255,0.4);
             paint-order: stroke fill;
             display: flex;
@@ -629,14 +638,12 @@
         }
         
         .auth-stamp { 
-            font-family: 'Frutiger LT Std Light', sans-serif;
-            font-size: 0.55rem; font-weight: normal !important; letter-spacing: 1px; line-height: 1; text-transform: uppercase; 
+            font-family: 'Frutiger Extra Black', sans-serif;
+            font-size: 0.38rem; font-weight: normal !important; letter-spacing: 0.1px; line-height: 1; text-transform: uppercase; 
             color: #000;
             font-style: italic;
             text-align: right;
             padding-right: 0;
-            -webkit-text-stroke: 0.4px rgba(255,255,255,0.7);
-            paint-order: stroke fill;
         }
         
         .reset-btn { background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); cursor: pointer; }
@@ -663,6 +670,7 @@
             totalStars: 4250,
             totalForks: 412,
             primaryLang: "Rust",
+            persona: "Expert in high-performance rendering engines and distributed cloud systems.",
             skills: ["Rust", "TypeScript", "WebGPU", "C++", "Three.js", "React", "Python"],
             repos: [
                 { name: "BackTrack", stars: 4200, desc: "A high-performance system monitoring tool for hyper-scaling cloud environments." },
@@ -741,6 +749,24 @@
                             <div className="visual-window" style={{ transform: "translateZ(10px)", background: currentStyle.windowBg }}></div>
                             <div className="window-bottom-edge" style={{ transform: "translateZ(15px) skewX(-15deg)" }}></div>
                             
+                            {/* Overlapping Top Metadata Bar Experiment */}
+                            <div style={{ 
+                                position: 'absolute', top: '-6px', left: '50%', width: '210px', height: '20px', zIndex: 20, transform: 'translateZ(50px) translateX(-50%)',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                background: 'linear-gradient(rgba(255,255,255,0.1), rgba(255,255,255,0.1)) padding-box, linear-gradient(180deg, #cbd5e1 0%, #ffffff 30%, #1e293b 100%) border-box',
+                                boxShadow: '2px 2px 4px rgba(0,0,0,0.5)',
+                                borderRadius: '0 0 8px 8px', 
+                                border: '1.5px solid rgba(255,255,255,0.3)'
+                            }}>
+                                <div style={{ 
+                                    fontFamily: "'Humanist 521 Bold Italic', sans-serif", 
+                                    fontSize: '0.7rem', color: '#000', letterSpacing: '0.5px', opacity: 1,
+                                    transform: 'none'
+                                }}>
+                                    DEVDEX // GITHUB
+                                </div>
+                            </div>
+
                             <div className="card-header-compact" style={{ transform: "translateZ(40px)" }}>
                                 <img src={data.avatar} className="profile-pic" alt="Avatar" />
                                 <div className="header-content">
@@ -754,19 +780,22 @@
                             </div>
 
                             <div className="repos-section-expanded" style={{ transform: "translateZ(30px)" }}>
-                                <div className="section-header-bar">
-                                    <div className="section-title">Latest Repositories</div>
-                                </div>
-                                {data.repos.slice(0, 2).map((r, i) => (
-                                    <div className="repo-item" key={i}>
+                                <div style={{ position: 'relative', height: '22px', marginBottom: '12px', marginLeft: '-14px', width: 'calc(100% + 28px)' }}>
+                                    {/* Base Rectangle (Darker Metallic Grey) */}
+                                    <div className="section-header-bar" style={{ 
+                                        position: 'absolute', top: 0, left: 0, margin: 0, width: '100%',
+                                        background: 'linear-gradient(rgba(255,255,255,0.05), rgba(255,255,255,0.05)) padding-box, linear-gradient(180deg, #475569 0%, #64748b 30%, #0f172a 100%) border-box',
+                                        borderRadius: '8px 0 8px 0'
+                                    }}></div>                                    {/* Initial (Top) Rectangle - Left Justified Content */}
+                                    <div className="section-header-bar" style={{ position: 'absolute', top: 0, left: '3%', margin: 0, width: '94%', boxShadow: 'none', paddingLeft: '24px', justifyContent: 'flex-start', borderRadius: '8px 0 8px 0' }}>
+                                        <div className="section-title" style={{ transform: 'skewX(15deg)' }}>Latest Repositories</div>
+                                    </div>                                </div>                                {data.repos.slice(0, 2).map((r, i) => (                                    <div className="repo-item" key={i}>
                                         <div className="repo-header">
                                             <div className="repo-name">{r.name}</div>
                                             <div className="repo-stars">
                                                 {r.stars}
                                                 <div className="star-circle">
-                                                    <div className="star-inner-ring">
-                                                        <span className="star-filled">★</span>
-                                                    </div>
+                                                    <span className="star-filled">★</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -776,8 +805,17 @@
                             </div>
 
                             <div className="stack-footer-expanded" style={{ transform: "translateZ(25px)" }}>
-                                <div className="section-header-bar">
-                                    <div className="section-title">Top Stack</div>
+                                <div style={{ position: 'relative', height: '22px', marginBottom: '12px', marginLeft: '-14px', width: 'calc(100% + 28px)' }}>
+                                    {/* Base Rectangle (Darker Metallic Grey) */}
+                                    <div className="section-header-bar" style={{ 
+                                        position: 'absolute', top: 0, left: 0, margin: 0, width: '100%',
+                                        background: 'linear-gradient(rgba(255,255,255,0.05), rgba(255,255,255,0.05)) padding-box, linear-gradient(180deg, #475569 0%, #64748b 30%, #0f172a 100%) border-box',
+                                        borderRadius: '8px 0 8px 0'
+                                    }}></div>
+                                    {/* Initial (Top) Rectangle - Left Justified Content */}
+                                    <div className="section-header-bar" style={{ position: 'absolute', top: 0, left: '3%', margin: 0, width: '94%', boxShadow: 'none', paddingLeft: '24px', justifyContent: 'flex-start', borderRadius: '8px 0 8px 0' }}>
+                                        <div className="section-title" style={{ transform: 'skewX(15deg)' }}>Top Stack</div>
+                                    </div>
                                 </div>
                                 <div className="stack-list">
                                     {(() => {
@@ -798,10 +836,30 @@
                             </div>
 
                             <div className="card-anchor-footer" style={{ transform: "translateZ(20px)" }}>
-                                <div className="tier-metallic-badge">
-                                    <span className="tier-text">{data.tier}</span>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'center' }}>
+                                    <div className="tier-metallic-badge">
+                                        <span className="tier-text">{data.tier}</span>
+                                    </div>
+                                    <div className="auth-stamp" style={{ textAlign: 'center', width: '100%' }}>
+                                        {data.publicRepos} REPOS / {data.totalForks} FORKS
+                                    </div>
                                 </div>
-                                <div className="auth-stamp">{data.publicRepos} REPOS / {data.totalForks} FORKS</div>
+                                <div style={{ flex: 1, maxWidth: '190px', textAlign: 'right', paddingLeft: '10px' }}>
+                                    <div style={{ 
+                                        fontSize: '0.72rem', 
+                                        lineHeight: '1.1', 
+                                        color: '#000', 
+                                        fontFamily: "'Sanvito Pro Regular', sans-serif",
+                                        display: '-webkit-box',
+                                        WebkitLineClamp: '3',
+                                        WebkitBoxOrient: 'vertical',
+                                        overflow: 'hidden',
+                                        textTransform: 'none',
+                                        opacity: 0.95
+                                    }}>
+                                        {data.persona || "AI-generated profile analysis pending..."}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </motion.div>
